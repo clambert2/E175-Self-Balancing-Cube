@@ -1,0 +1,71 @@
+   (1) % Define rigid frames, variables, points, and constants
+   (2) RigidFrame N, B, B1, B2, CX, CY, CZ
+   (3) Variable qBx'', qBy'', qBz''', qCx'', qCy'', qCz''
+   (4) Point N0(N), Bcm(B), CXcm(CX), CYcm(CY), CZcm(CZ)
+   (5) Constant L
+   (6) % Define relations between reference frames
+   (7) B.Rotate(N, nz>, qBz) % Changed this line to go to B
+-> (8) B_N = [cos(qBz), sin(qBz), 0;  -sin(qBz), cos(qBz), 0;  0, 0, 1]
+-> (9) w_B_N> = qBz'*Bz>
+-> (10) alf_B_N> = qBz''*Bz>
+
+   (11) % B2.Rotate(B1, nx>, qBx)
+   (12) % B.Rotate(B2, ny>, qBy)
+   (13) CX.RotateX(B, qCx)
+-> (14) CX_B = [1, 0, 0;  0, cos(qCx), sin(qCx);  0, -sin(qCx), cos(qCx)]
+-> (15) w_CX_B> = qCx'*CXx>
+-> (16) alf_CX_B> = qCx''*CXx>
+
+   (17) CY.RotateY(B, qCy)
+-> (18) CY_B = [cos(qCy), 0, -sin(qCy);  0, 1, 0;  sin(qCy), 0, cos(qCy)]
+-> (19) w_CY_B> = qCy'*CYy>
+-> (20) alf_CY_B> = qCy''*CYy>
+
+   (21) CZ.RotateZ(B, qCz)
+-> (22) CZ_B = [cos(qCz), sin(qCz), 0;  -sin(qCz), cos(qCz), 0;  0, 0, 1]
+-> (23) w_CZ_B> = qCz'*CZz>
+-> (24) alf_CZ_B> = qCz''*CZz>
+
+   (25) % Display angular accelerations and angular velocities
+   (26) % Define positions of points of interest
+   (27) p_N0_Bcm> = L/3 * bx> + L/3 * by> + L/3 * bz>
+-> (28) p_N0_Bcm> = 0.3333333*L*Bx> + 0.3333333*L*By> + 0.3333333*L*Bz>
+
+   (29) p_N0_CXcm> = L/2 * by> + L/2 * Bz>
+-> (30) p_N0_CXcm> = 0.5*L*By> + 0.5*L*Bz>
+
+   (31) p_N0_CYcm> = L/2 * bx> + L/2 * Bz>
+-> (32) p_N0_CYcm> = 0.5*L*Bx> + 0.5*L*Bz>
+
+   (33) p_N0_CZcm> = L/2 * bx> + L/2 * by>
+-> (34) p_N0_CZcm> = 0.5*L*Bx> + 0.5*L*By>
+
+   (35) % Calculate velocities and accelerations of points of interest
+   (36) v_N0_N> = 0>
+-> (37) v_N0_N> = 0>
+
+   (38) Bcm.SetVelocity(N, Dt(p_N0_Bcm>, N))
+-> (39) v_Bcm_N> = -0.3333333*L*qBz'*Bx> + 0.3333333*L*qBz'*By>
+
+   (40) Bcm.SetAcceleration(N, Dt(v_Bcm_N>, N))
+-> (41) a_Bcm_N> = -0.3333333*L*(qBz'^2+qBz'')*Bx> - 0.3333333*L*(qBz'^2-qBz'')*By>
+
+   (42) CXcm.SetVelocity(N, Dt(p_N0_CXcm>, N))
+-> (43) v_CXcm_N> = -0.5*L*qBz'*Bx>
+
+   (44) CXcm.SetAcceleration(N, Dt(v_CXcm_N>, N))
+-> (45) a_CXcm_N> = -0.5*L*qBz''*Bx> - 0.5*L*qBz'^2*By>
+
+   (46) CYcm.SetVelocity(N, Dt(p_N0_CYcm>, N))
+-> (47) v_CYcm_N> = 0.5*L*qBz'*By>
+
+   (48) CYcm.SetAcceleration(N, Dt(v_CYcm_N>, N))
+-> (49) a_CYcm_N> = -0.5*L*qBz'^2*Bx> + 0.5*L*qBz''*By>
+
+   (50) CZcm.SetVelocity(N, Dt(p_N0_CZcm>, N))
+-> (51) v_CZcm_N> = -0.5*L*qBz'*Bx> + 0.5*L*qBz'*By>
+
+   (52) CZcm.SetAcceleration(N, Dt(v_CZcm_N>, N))
+-> (53) a_CZcm_N> = -0.5*L*(qBz'^2+qBz'')*Bx> - 0.5*L*(qBz'^2-qBz'')*By>
+
+   (54) 

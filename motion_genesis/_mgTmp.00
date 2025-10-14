@@ -1,0 +1,28 @@
+% Define rigid frames, variables, points, and constants
+RigidFrame N, B, B1, B2, CX, CY, CZ
+Variable qBx'', qBy'', qBz''', qCx'', qCy'', qCz''
+Point N0(N), Bcm(B), CXcm(CX), CYcm(CY), CZcm(CZ)
+Constant L
+% Define relations between reference frames
+B.Rotate(N, nz>, qBz) % Changed this line to go to B
+% B2.Rotate(B1, nx>, qBx)
+% B.Rotate(B2, ny>, qBy)
+CX.RotateX(B, qCx)
+CY.RotateY(B, qCy)
+CZ.RotateZ(B, qCz)
+% Display angular accelerations and angular velocities
+% Define positions of points of interest
+p_N0_Bcm> = L/3 * bx> + L/3 * by> + L/3 * bz>
+p_N0_CXcm> = L/2 * by> + L/2 * Bz>
+p_N0_CYcm> = L/2 * bx> + L/2 * Bz>
+p_N0_CZcm> = L/2 * bx> + L/2 * by>
+% Calculate velocities and accelerations of points of interest
+v_N0_N> = 0>
+Bcm.SetVelocity(N, Dt(p_N0_Bcm>, N))
+Bcm.SetAcceleration(N, Dt(v_Bcm_N>, N))
+CXcm.SetVelocity(N, Dt(p_N0_CXcm>, N))
+CXcm.SetAcceleration(N, Dt(v_CXcm_N>, N))
+CYcm.SetVelocity(N, Dt(p_N0_CYcm>, N))
+CYcm.SetAcceleration(N, Dt(v_CYcm_N>, N))
+CZcm.SetVelocity(N, Dt(p_N0_CZcm>, N))
+CZcm.SetAcceleration(N, Dt(v_CZcm_N>, N))
