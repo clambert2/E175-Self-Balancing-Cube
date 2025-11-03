@@ -65,30 +65,30 @@
     \fill[black] (4, 3*0.707) -- ++(2pt,0) arc (0:90:2pt) -- cycle;
     \fill[black] (4, 3*0.707) -- ++(-2pt,0) arc (180:270:2pt) -- cycle;
     % label as B sub cm in small font
-    \node at (4, 3*0.707-0.3) {\small $C_{cm}$};
+    \node at (4, 3*0.707-0.3) {\small $B_{cm}$};
 
     % In blue make a circle with a capital B in the center and an arrow point to the square
     % circle
     \draw[blue] (1.4,4.5) circle (6pt);
     % arc arrow from circle to square center of side (2, 6*0.707)
-    \node[blue] at (1.4,4.5) {\textbf{C}};
+    \node[blue] at (1.4,4.5) {\textbf{B}};
     % arrow
     \draw[->, blue] (1.6,4.5) -- (2.5, 6*0.707);
 
     % in blue at the cetner of the circle make another reference frame that is b and is aligned with the cube
     % draw the x and y axes of the b frame
     % X-Axis (center of square to
-    \draw[->, thick, blue] (4, 4*0.707) -- (4+1*0.707, 4*0.707 + 1*0.707) node[above right] {\textbf{$\hat{c}_x$}};
+    \draw[->, thick, blue] (4, 4*0.707) -- (4+1*0.707, 4*0.707 + 1*0.707) node[above right] {\textbf{$\hat{b}_x$}};
     % Y-Axis
-    \draw[->, thick, blue] (4, 4*0.707) -- (4-1*0.707, 4*0.707 + 1*0.707) node[above left] {\textbf{$\hat{c}_y$}};
+    \draw[->, thick, blue] (4, 4*0.707) -- (4-1*0.707, 4*0.707 + 1*0.707) node[above left] {\textbf{$\hat{b}_y$}};
     % Label the ref frame as B to the bottom left of the origin
-    \node[blue] at (4-0.3, 4*0.707-0.2) {$C$};
+    \node[blue] at (4-0.3, 4*0.707-0.2) {$B$};
     % Draw the Z-axis symbol for the B frame
     % A circle with a dot in the center means the vector is pointing OUT of the page (towards the viewer).
     \draw[fill=black, blue] (4, 4*0.707) circle (1pt);
     \draw[thin, blue] (4, 4*0.707) circle (3pt);
     % Label the Z-axis near the origin of the B frame
-    \node[blue] at (4, 4*0.707+0.5) {$\hat{c}_z$};
+    \node[blue] at (4, 4*0.707+0.5) {$\hat{b}_z$};
 
     % Label the Z-axis near the origin % needs to be n with hat sub z
     \node[ForestGreen] at (0.5*\arcrad, 0.5*\arcrad) {$\hat{n}_z$};
@@ -96,8 +96,8 @@
     % \fill (0,0) circle (1.5pt) node[below left] {$O$};
 
     % label the orange circle as body C it should be a C in a red cirlce with an arrow pointing to the circle
-    \draw[red] (5.5,5) circle (9pt);
-    \node[red] at (5.5,5) {\textbf{$RX$}};
+    \draw[red] (5.5,5) circle (8pt);
+    \node[red] at (5.5,5) {\textbf{$C_{1}$}};
     \draw[->, red] (5.5-0.2,5-0.2) -- (4.7, 4*0.707+1.35);
 
     % % on top of the b reference frame make a new reference frame c that is aligned with n 
@@ -134,7 +134,7 @@
     \fill[black] (4, -10+3*0.707) -- ++(2pt,0) arc (0:90:2pt) -- cycle;
     \fill[black] (4, -10+3*0.707) -- ++(-2pt,0) arc (180:270:2pt) -- cycle;
     % label as B sub cm in small font
-    \node at (4 + 0.4, -10+3*0.707) {\small $C_{cm}$};
+    \node at (4 + 0.4, -10+3*0.707) {\small $B_{cm}$};
 
     % add n reference frame again
     % X-Axis
@@ -159,6 +159,10 @@
     \draw[->, thick, purple] (4, -10) -- (4, -10+1) node[above] {};
     % add a label in purple near the normal force vector that says Fn
     \node[purple] at (4 - 0.4, -10+1) {\small $F_n$};
+
+    % start a new page
+    \pagebreak
+    
 
 
 \end{tikzpicture}

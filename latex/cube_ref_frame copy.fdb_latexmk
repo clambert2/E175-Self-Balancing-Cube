@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1761892268.7103 "c:/Users/charl/Documents/GitHub/E175-Self-Balancing-Cube/latex/cube_ref_frame.tex" "cube_ref_frame.pdf" "cube_ref_frame" 1761892269.42616 0
+["pdflatex"] 1761873366.50425 "c:/Users/charl/Documents/GitHub/E175-Self-Balancing-Cube/latex/cube_ref_frame copy.tex" "cube_ref_frame copy.pdf" "cube_ref_frame copy" 1761873367.24727 0
   "C:/Users/charl/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1759208434 82507 a9eef8696c92627b87e9975edea03b2a ""
   "C:/Users/charl/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1705951901 24225087 be210f9e4bc2ee20510fe5459cda3ffd ""
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1233951848 1004 54797486969f23fa377b128694d548df ""
@@ -17,6 +17,7 @@
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb" 1247596667 36281 c355509802a035cadc5f15869451dcee ""
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi9.pfb" 1247596667 36094 798f80770b3b148ceedd006d487db67c ""
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1247596667 35752 024fb6c41858982481f6968b5fc26508 ""
+  "C:/Users/charl/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1247596667 32762 7fee39e011c23b3589931effd97b9702 ""
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/tex/context/base/mkii/supp-pdf.mkii" 1580390158 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/tex/generic/iftex/iftex.sty" 1643997108 7237 bdd120a32c8fdb4b433cf9ca2e7cd98a ""
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/tex/generic/infwarerr/infwarerr.sty" 1575399508 8356 7bbb2c2373aa810be568c29e333da8ed ""
@@ -114,11 +115,11 @@
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/tex/latex/pgf/utilities/pgfrcs.sty" 1673775190 325 f9f16d12354225b7dd52a3321f085955 ""
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/tex/latex/tikz-3dplot/tikz-3dplot.sty" 1326310201 32488 0c21c95f67b6fe919f5892b4d3ac7813 ""
   "C:/Users/charl/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "c:/Users/charl/Documents/GitHub/E175-Self-Balancing-Cube/latex/cube_ref_frame.tex" 1761892268 8158 f67e08281e9dfd74ff2c1235b6ed37ac ""
-  "cube_ref_frame.aux" 1761892269 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "cube_ref_frame.tex" 1761892268 8158 f67e08281e9dfd74ff2c1235b6ed37ac ""
+  "c:/Users/charl/Documents/GitHub/E175-Self-Balancing-Cube/latex/cube_ref_frame copy.tex" 1759353732 8161 3b28b646c3ac86645078b83932d6ea33 ""
+  "cube_ref_frame copy.aux" 1761873367 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "cube_ref_frame copy.tex" 1759353732 8161 3b28b646c3ac86645078b83932d6ea33 ""
   (generated)
-  "cube_ref_frame.aux"
-  "cube_ref_frame.log"
-  "cube_ref_frame.pdf"
+  "cube_ref_frame copy.aux"
+  "cube_ref_frame copy.log"
+  "cube_ref_frame copy.pdf"
   (rewritten before read)

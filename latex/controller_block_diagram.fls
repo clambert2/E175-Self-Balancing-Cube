@@ -1,7 +1,7 @@
 PWD c:\Users\charl\Documents\GitHub\E175-Self-Balancing-Cube\latex
 INPUT C:\Users\charl\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
-INPUT c:\Users\charl\Documents\GitHub\E175-Self-Balancing-Cube\latex\cube_ref_frame.tex
-OUTPUT cube_ref_frame.log
+INPUT c:\Users\charl\Documents\GitHub\E175-Self-Balancing-Cube\latex\controller_block_diagram.tex
+OUTPUT controller_block_diagram.log
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\latex\base\size10.clo
@@ -152,10 +152,10 @@ INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\latex\graphics\dvipsnam.d
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\latex\graphics\dvipsnam.def
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
-INPUT .\cube_ref_frame.aux
-INPUT .\cube_ref_frame.aux
-INPUT cube_ref_frame.aux
-OUTPUT cube_ref_frame.aux
+INPUT .\controller_block_diagram.aux
+INPUT .\controller_block_diagram.aux
+INPUT controller_block_diagram.aux
+OUTPUT controller_block_diagram.aux
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
@@ -191,9 +191,9 @@ INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy6.tfm
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex9.tfm
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx10.tfm
-OUTPUT cube_ref_frame.pdf
+OUTPUT controller_block_diagram.pdf
 INPUT C:\Users\charl\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
-INPUT cube_ref_frame.aux
+INPUT controller_block_diagram.aux
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi10.pfb
@@ -206,3 +206,5 @@ INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\c
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi9.pfb
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr10.pfb
 INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr10.pfb
+INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr7.pfb
+INPUT C:\Users\charl\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr7.pfb
