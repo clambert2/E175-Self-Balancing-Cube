@@ -1,0 +1,17 @@
+NewtonianFrame N % Ground frame
+RigidFrame C1 % Define intermediate frame for rotations
+RigidBody C, RX, RY, RZ % Defines all bodies
+Variable theta'', phi''
+Constant g, RCMX, RCMY, RCMZ, CCMX, CCMY, CCMZ
+% Define rotations
+C1.RotateZ(N, theta)
+C.RotateX(C1, phi)
+% Define distances between points
+P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
+P_No_RXcm> = -RCMY*Cz> + RCMX*Cy> + RCMZ*Cx>
+P_No_RYcm> = -RCMX*Cz> + RCMZ*Cy> + RCMY*Cx>
+P_No_RZcm> = -RCMX*Cz> + RCMY*Cy> + RCMX*Cx>
+% distance from other side 144.211 mm
+% Input actual dimensions
+Input RCMX = 76 mm, RCMY = 76 mm, RCMZ = 7.789 mm
+Input CCMX = 72.1130 mm, CCMY = 71.399 mm, CCMZ = 71.4670 mm

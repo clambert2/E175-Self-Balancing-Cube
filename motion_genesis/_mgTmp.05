@@ -1,0 +1,36 @@
+   (1) NewtonianFrame N % Ground frame
+   (2) RigidFrame C1 % Define intermediate frame for rotations
+   (3) RigidBody C, RX, RY, RZ % Defines all bodies
+   (4) Variable theta'', phi''
+   (5) Constant g, RCMX, RCMY, RCMZ, CCMX, CCMY, CCMZ
+   (6) % Define rotations
+   (7) C1.RotateZ(N, theta)
+-> (8) C1_N = [cos(theta), sin(theta), 0;  -sin(theta), cos(theta), 0;  0, 0, 1]
+-> (9) w_C1_N> = theta'*C1z>
+-> (10) alf_C1_N> = theta''*C1z>
+
+   (11) C.RotateX(C1, phi)
+-> (12) C_C1 = [1, 0, 0;  0, cos(phi), sin(phi);  0, -sin(phi), cos(phi)]
+-> (13) w_C_C1> = phi'*Cx>
+-> (14) w_C_N> = phi'*Cx> + theta'*C1z>
+-> (15) alf_C_C1> = phi''*Cx>
+-> (16) alf_C_N> = phi''*Cx> + phi'*theta'*C1y> + theta''*C1z>
+
+   (17) % Define distances between points
+   (18) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
+-> (19) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
+
+   (20) P_No_RXcm> = -RCMY*Cz> + RCMX*Cy> + RCMZ*Cx>
+-> (21) P_No_RXcm> = RCMZ*Cx> + RCMX*Cy> - RCMY*Cz>
+
+   (22) P_No_RYcm> = -RCMX*Cz> + RCMZ*Cy> + RCMY*Cx>
+-> (23) P_No_RYcm> = RCMY*Cx> + RCMZ*Cy> - RCMX*Cz>
+
+   (24) P_No_RZcm> = -RCMX*Cz> + RCMY*Cy> + RCMX*Cx>
+-> (25) P_No_RZcm> = RCMX*Cx> + RCMY*Cy> - RCMX*Cz>
+
+   (26) % distance from other side 144.211 mm
+   (27) % Input actual dimensions
+   (28) Input RCMX = 76 mm, RCMY = 76 mm, RCMZ = 7.789 mm
+   (29) Input CCMX = 72.1130 mm, CCMY = 71.399 mm, CCMZ = 71.4670 mm
+   (30) 

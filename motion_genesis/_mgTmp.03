@@ -1,0 +1,6 @@
+   (1) NewtonianFrame N % Ground frame
+   (2) RigidFrame C1 % Defines intermediate frame for rotations
+   (3) RigidBody C, RX, RY, RZ % Defines all bodies
+   (4) Variable theta'', phi''
+   (5) Constant g
+   (6) P_No_Ccm = L*Nz>
