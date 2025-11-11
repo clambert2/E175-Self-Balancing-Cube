@@ -1,77 +1,68 @@
-   (1) % Define rigid frames, variables, points, and constants
-   (2) RigidFrame N, B, Bbalance, CY, CX, CZ
-   (3) Variable qBx'', qCx'', qCy'', qCz''
-   (4) Point N0(N), Bcm(B), CXcm(CX), CYcm(CY), CZcm(CZ)
-   (5) Constant L
-   (6) Constant q1_balance = 45 degrees
-   (7) % Define relations between reference frames
-   (8) Bbalance.Rotate(N, nz>, q1_balance)
--> (9) Bbalance_N = [cos(q1_balance), sin(q1_balance), 0;  -sin(q1_balance), 
-       cos(q1_balance), 0;  0, 0, 1]
--> (10) w_Bbalance_N> = 0>
--> (11) alf_Bbalance_N> = 0>
+   (1) NewtonianFrame N % Ground frame
+   (2) RigidFrame C1 % Define intermediate frame for rotations
+   (3) RigidBody C, RX, RY, RZ % Defines all bodies
+   (4) Variable theta'', phi''
+   (5) Constant g, RCMX, RCMY, RCMZ, CCMX, CCMY, CCMZ
+   (6) % Define rotations
+   (7) C1.RotateZ(N, theta)
+-> (8) C1_N = [cos(theta), sin(theta), 0;  -sin(theta), cos(theta), 0;  0, 0, 1]
+-> (9) w_C1_N> = theta'*C1z>
+-> (10) alf_C1_N> = theta''*C1z>
 
-   (12) B.Rotate(Bbalance, nx>, qBx'')
--> (13) B_Bbalance[1,1] = cos(qBx'') + cos(q1_balance)^2*(1-cos(qBx''))
--> (14) B_Bbalance[1,2] = -sin(q1_balance)*cos(q1_balance)*(1-cos(qBx''))
--> (15) B_Bbalance[1,3] = sin(q1_balance)*sin(qBx'')
--> (16) B_Bbalance[2,1] = -sin(q1_balance)*cos(q1_balance)*(1-cos(qBx''))
--> (17) B_Bbalance[2,2] = cos(qBx'') + sin(q1_balance)^2*(1-cos(qBx''))
--> (18) B_Bbalance[2,3] = cos(q1_balance)*sin(qBx'')
--> (19) B_Bbalance[3,1] = -sin(q1_balance)*sin(qBx'')
--> (20) B_Bbalance[3,2] = -cos(q1_balance)*sin(qBx'')
--> (21) B_Bbalance[3,3] = cos(qBx'')
+   (11) C.RotateX(C1, phi)
+-> (12) C_C1 = [1, 0, 0;  0, cos(phi), sin(phi);  0, -sin(phi), cos(phi)]
+-> (13) w_C_C1> = phi'*Cx>
+-> (14) w_C_N> = phi'*Cx> + theta'*C1z>
+-> (15) alf_C_C1> = phi''*Cx>
+-> (16) alf_C_N> = phi''*Cx> + phi'*theta'*C1y> + theta''*C1z>
 
-   (22) CX.Rotatex(B, qCx)
--> (23) CX_B = [1, 0, 0;  0, cos(qCx), sin(qCx);  0, -sin(qCx), cos(qCx)]
--> (24) w_CX_B> = qCx'*CXx>
--> (25) alf_CX_B> = qCx''*CXx>
+   (17) % Define distances between points
+   (18) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
+-> (19) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
 
-   (26) CY.RotateY(B, qCy)
--> (27) CY_B = [cos(qCy), 0, -sin(qCy);  0, 1, 0;  sin(qCy), 0, cos(qCy)]
--> (28) w_CY_B> = qCy'*CYy>
--> (29) alf_CY_B> = qCy''*CYy>
+   (20) P_No_RXcm> = -RCMY*Cz> + RCMX*Cy> + RCMZ*Cx>
+-> (21) P_No_RXcm> = RCMZ*Cx> + RCMX*Cy> - RCMY*Cz>
 
-   (30) CZ.RotateZ(B, qCz)
--> (31) CZ_B = [cos(qCz), sin(qCz), 0;  -sin(qCz), cos(qCz), 0;  0, 0, 1]
--> (32) w_CZ_B> = qCz'*CZz>
--> (33) alf_CZ_B> = qCz''*CZz>
+   (22) P_No_RYcm> = -RCMX*Cz> + RCMZ*Cy> + RCMY*Cx>
+-> (23) P_No_RYcm> = RCMY*Cx> + RCMZ*Cy> - RCMX*Cz>
 
-   (34) % Display angular velocities and angular accelerations
-   (35) w_B_N> = qBx'*nx>
--> (36) w_B_N> = qBx'*Nx>
+   (24) P_No_RZcm> = -RCMX*Cz> + RCMY*Cy> + RCMX*Cx>
+-> (25) P_No_RZcm> = RCMX*Cx> + RCMY*Cy> - RCMX*Cz>
 
-   (37) alf_B_N> = qBx''*nx>
--> (38) alf_B_N> = qBx''*Nx>
+   (26) % Find velocities of All CMs
+   (27) v_No_N> = 0>
+-> (28) v_No_N> = 0>
 
-   (39) % Define positions of points of interest
-   (40) p_N0_Bcm> = L/3 * bx> + L/3 * by> + L/3 * bz>
--> (41) p_N0_Bcm> = 0.3333333*L*Bx> + 0.3333333*L*By> + 0.3333333*L*Bz>
+   (29) v_No_C> = 0>
+-> (30) v_No_C> = 0>
 
-   (42) p_N0_CXcm> = L/2 * by> + L/2 * Bz>
--> (43) p_N0_CXcm> = 0.5*L*By> + 0.5*L*Bz>
+   (31) Ccm.SetVelocity(N, No)
+-> (32) v_Ccm_N> = -(CCMX*cos(phi)+CCMY*sin(phi))*theta'*Cx> + CCMY*phi'*Cy>
+        + CCMX*phi'*Cz> + CCMZ*theta'*C1y>
 
-   (44) p_N0_CYcm> = L/2 * bx> + L/2 * Bz>
--> (45) p_N0_CYcm> = 0.5*L*Bx> + 0.5*L*Bz>
+   (33) RXcm.SetVelocity(N, No)
+-> (34) v_RXcm_N> = -(RCMX*cos(phi)+RCMY*sin(phi))*theta'*Cx> + RCMY*phi'*Cy>
+        + RCMX*phi'*Cz> + RCMZ*theta'*C1y>
 
-   (46) p_N0_CZcm> = L/2 * bx> + L/2 * by>
--> (47) p_N0_CZcm> = 0.5*L*Bx> + 0.5*L*By>
+   (35) RYcm.SetVelocity(N, No)
+-> (36) v_RYcm_N> = -(RCMX*sin(phi)+RCMZ*cos(phi))*theta'*Cx> + RCMX*phi'*Cy>
+        + RCMZ*phi'*Cz> + RCMY*theta'*C1y>
 
-   (48) % Calculate velocities and accelerations of points of interest
-   (49) v_N0_N> = 0>
--> (50) v_N0_N> = 0>
+   (37) RZcm.SetVelocity(N, No)
+-> (38) v_RZcm_N> = -(RCMX*sin(phi)+RCMY*cos(phi))*theta'*Cx> + RCMX*phi'*Cy>
+        + RCMY*phi'*Cz> + RCMX*theta'*C1y>
 
-   (51) Bcm.SetVelocity(N, Dt(p_N0_Bcm>, N))
--> (52) v_Bcm_N> = -0.3333333*L*sin(q1_balance)*qBx'*Bx> - 0.3333333*L*cos(q1_
-        balance)*qBx'*By> + 0.3333333*L*(sin(q1_balance)+cos(q1_balance))*qBx'*Bz>
-
-   (53) Bcm.SetAcceleration(N, Dt(v_Bcm_N>, N))
--> (54) a_Bcm_N> = -0.3333333*L*sin(q1_balance)*((sin(q1_balance)+cos(q1_balan
-        ce))*qBx'^2+qBx'')*Bx> - 0.3333333*L*cos(q1_balance)*((sin(q1_balance)+
-        cos(q1_balance))*qBx'^2+qBx'')*By> - 0.3333333*L*(qBx'^2-(sin(q1_balan
-        ce)+cos(q1_balance))*qBx'')*Bz>
-
-   (55) % CZcm.SetVelocity(N, Dt(p_N0_CZcm>, N))
-   (56) % CZcm.SetAcceleration(N, Dt(v_CZcm_N>, N))
-   (57) % Compute angular momentum of the rotor and cube
-   (58) help
+   (39) % Set inertia dyadics
+   (40) C.SetInertia(No, CIXX, CIYY, CIZZ, CIXY, CIYZ, CIXZ) % Cube frame about No
+   (41) RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, RXIXY, RXIYZ, RXIXZ) % X Rotor about RXcm
+   (42) RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, RYIXY, RYIYZ, RYIXZ) % Y Rotor about RXcm
+   (43) RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, RZIYZ, RZIXZ) % Z Rotor about RXcm
+   (44) % CM Positions
+   (45) Input RCMX = 0.076 m, RCMY = 0.076 m, RCMZ = 0.007789 m
+   (46) Input CCMX = 0.072113 m, CCMY = 0.071399 m, CCMZ = 0.071467 m
+   (47) % Cube Inertia Dyadic about No
+   (48) Input CIXX = 0.011496398 kg*m^2, CIYY = 0.011603443 kg*m^2, CIZZ = 0.011600232 kg*m^2
+   (49) Input CIXY = -0.004360713 kg*m^2, CIXZ = 0.004366281 kg*m^2, CIYZ = 0.004314224 kg*m^2
+   (50) % Z Rotor inertia dyadic about RZcm
+   (51) cd "c:\Users\charl\Documents\GitHub\E175-Self-Balancing-Cube\motion_genesis"
+   (52) MotionGenesis cube.txt

@@ -1,28 +1,34 @@
-% Define rigid frames, variables, points, and constants
-RigidFrame N, B, Bbalance, CY, CX, CZ
-Variable qBx'', qCx'', qCy'', qCz''
-Point N0(N), Bcm(B), CXcm(CX), CYcm(CY), CZcm(CZ)
-Constant L
-Constant q1_balance = 45 degrees
-% Define relations between reference frames
-Bbalance.Rotate(N, nz>, q1_balance)
-B.Rotate(Bbalance, nx>, qBx'')
-CX.Rotatex(B, qCx)
-CY.RotateY(B, qCy)
-CZ.RotateZ(B, qCz)
-% Display angular velocities and angular accelerations
-w_B_N> = qBx'*nx>
-alf_B_N> = qBx''*nx>
-% Define positions of points of interest
-p_N0_Bcm> = L/3 * bx> + L/3 * by> + L/3 * bz>
-p_N0_CXcm> = L/2 * by> + L/2 * Bz>
-p_N0_CYcm> = L/2 * bx> + L/2 * Bz>
-p_N0_CZcm> = L/2 * bx> + L/2 * by>
-% Calculate velocities and accelerations of points of interest
-v_N0_N> = 0>
-Bcm.SetVelocity(N, Dt(p_N0_Bcm>, N))
-Bcm.SetAcceleration(N, Dt(v_Bcm_N>, N))
-% CZcm.SetVelocity(N, Dt(p_N0_CZcm>, N))
-% CZcm.SetAcceleration(N, Dt(v_CZcm_N>, N))
-% Compute angular momentum of the rotor and cube
-help
+NewtonianFrame N % Ground frame
+RigidFrame C1 % Define intermediate frame for rotations
+RigidBody C, RX, RY, RZ % Defines all bodies
+Variable theta'', phi''
+Constant g, RCMX, RCMY, RCMZ, CCMX, CCMY, CCMZ
+% Define rotations
+C1.RotateZ(N, theta)
+C.RotateX(C1, phi)
+% Define distances between points
+P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
+P_No_RXcm> = -RCMY*Cz> + RCMX*Cy> + RCMZ*Cx>
+P_No_RYcm> = -RCMX*Cz> + RCMZ*Cy> + RCMY*Cx>
+P_No_RZcm> = -RCMX*Cz> + RCMY*Cy> + RCMX*Cx>
+% Find velocities of All CMs
+v_No_N> = 0>
+v_No_C> = 0>
+Ccm.SetVelocity(N, No)
+RXcm.SetVelocity(N, No)
+RYcm.SetVelocity(N, No)
+RZcm.SetVelocity(N, No)
+% Set inertia dyadics
+C.SetInertia(No, CIXX, CIYY, CIZZ, CIXY, CIYZ, CIXZ) % Cube frame about No
+RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, RXIXY, RXIYZ, RXIXZ) % X Rotor about RXcm
+RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, RYIXY, RYIYZ, RYIXZ) % Y Rotor about RXcm
+RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, RZIYZ, RZIXZ) % Z Rotor about RXcm
+% CM Positions
+Input RCMX = 0.076 m, RCMY = 0.076 m, RCMZ = 0.007789 m
+Input CCMX = 0.072113 m, CCMY = 0.071399 m, CCMZ = 0.071467 m
+% Cube Inertia Dyadic about No
+Input CIXX = 0.011496398 kg*m^2, CIYY = 0.011603443 kg*m^2, CIZZ = 0.011600232 kg*m^2
+Input CIXY = -0.004360713 kg*m^2, CIXZ = 0.004366281 kg*m^2, CIYZ = 0.004314224 kg*m^2
+% Z Rotor inertia dyadic about RZcm
+cd "c:\Users\charl\Documents\GitHub\E175-Self-Balancing-Cube\motion_genesis"
+MotionGenesis cube.txt
