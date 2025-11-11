@@ -1,68 +1,111 @@
    (1) NewtonianFrame N % Ground frame
    (2) RigidFrame C1 % Define intermediate frame for rotations
    (3) RigidBody C, RX, RY, RZ % Defines all bodies
-   (4) Variable theta'', phi''
+   (4) Variable theta'', phi'', qX'', qY'', qZ''
    (5) Constant g, RCMX, RCMY, RCMZ, CCMX, CCMY, CCMZ
-   (6) % Define rotations
-   (7) C1.RotateZ(N, theta)
--> (8) C1_N = [cos(theta), sin(theta), 0;  -sin(theta), cos(theta), 0;  0, 0, 1]
--> (9) w_C1_N> = theta'*C1z>
--> (10) alf_C1_N> = theta''*C1z>
+   (6) Point Scm
+   (7) % Set component mass
+   (8) C.SetMass(mC)
+   (9) RX.SetMass(mR)
+   (10) RY.SetMass(mR)
+   (11) RZ.SetMass(mR)
+   (12) % Define rotations
+   (13) C1.RotateZ(N, theta)
+-> (14) C1_N = [cos(theta), sin(theta), 0;  -sin(theta), cos(theta), 0;  0, 0, 1]
+-> (15) w_C1_N> = theta'*C1z>
+-> (16) alf_C1_N> = theta''*C1z>
 
-   (11) C.RotateX(C1, phi)
--> (12) C_C1 = [1, 0, 0;  0, cos(phi), sin(phi);  0, -sin(phi), cos(phi)]
--> (13) w_C_C1> = phi'*Cx>
--> (14) w_C_N> = phi'*Cx> + theta'*C1z>
--> (15) alf_C_C1> = phi''*Cx>
--> (16) alf_C_N> = phi''*Cx> + phi'*theta'*C1y> + theta''*C1z>
+   (17) C.RotateX(C1, phi)
+-> (18) C_C1 = [1, 0, 0;  0, cos(phi), sin(phi);  0, -sin(phi), cos(phi)]
+-> (19) w_C_C1> = phi'*Cx>
+-> (20) w_C_N> = phi'*Cx> + theta'*C1z>
+-> (21) alf_C_C1> = phi''*Cx>
+-> (22) alf_C_N> = phi''*Cx> + phi'*theta'*C1y> + theta''*C1z>
 
-   (17) % Define distances between points
-   (18) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
--> (19) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
+   (23) RX.RotateX(C, qX)
+-> (24) RX_C = [1, 0, 0;  0, cos(qX), sin(qX);  0, -sin(qX), cos(qX)]
+-> (25) w_RX_C> = qX'*RXx>
+-> (26) w_RX_N> = (phi'+qX')*Cx> + theta'*C1z>
+-> (27) alf_RX_C> = qX''*RXx>
+-> (28) alf_RX_N> = (phi''+qX'')*Cx> + theta'*(phi'+qX')*C1y> + theta''*C1z>
 
-   (20) P_No_RXcm> = -RCMY*Cz> + RCMX*Cy> + RCMZ*Cx>
--> (21) P_No_RXcm> = RCMZ*Cx> + RCMX*Cy> - RCMY*Cz>
+   (29) RY.RotateY(C, qY)
+-> (30) RY_C = [cos(qY), 0, -sin(qY);  0, 1, 0;  sin(qY), 0, cos(qY)]
+-> (31) w_RY_C> = qY'*RYy>
+-> (32) w_RY_N> = phi'*Cx> + theta'*C1z> + qY'*RYy>
+-> (33) alf_RY_C> = qY''*RYy>
+-> (34) alf_RY_N> = (phi''-cos(phi)*qY'*theta')*Cx> + phi'*qY'*Cz> + phi'*thet
+        a'*C1y> + theta''*C1z> + qY''*RYy>
 
-   (22) P_No_RYcm> = -RCMX*Cz> + RCMZ*Cy> + RCMY*Cx>
--> (23) P_No_RYcm> = RCMY*Cx> + RCMZ*Cy> - RCMX*Cz>
+   (35) RZ.RotateZ(C, qZ)
+-> (36) RZ_C = [cos(qZ), sin(qZ), 0;  -sin(qZ), cos(qZ), 0;  0, 0, 1]
+-> (37) w_RZ_C> = qZ'*RZz>
+-> (38) w_RZ_N> = phi'*Cx> + theta'*C1z> + qZ'*RZz>
+-> (39) alf_RZ_C> = qZ''*RZz>
+-> (40) alf_RZ_N> = (sin(phi)*qZ'*theta'+phi'')*Cx> - phi'*qZ'*Cy> + phi'*thet
+        a'*C1y> + theta''*C1z> + qZ''*RZz>
 
-   (24) P_No_RZcm> = -RCMX*Cz> + RCMY*Cy> + RCMX*Cx>
--> (25) P_No_RZcm> = RCMX*Cx> + RCMY*Cy> - RCMX*Cz>
+   (41) % Define distances between points
+   (42) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
+-> (43) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
 
-   (26) % Find velocities of All CMs
-   (27) v_No_N> = 0>
--> (28) v_No_N> = 0>
+   (44) P_No_RXcm> = -RCMY*Cz> + RCMX*Cy> + RCMZ*Cx>
+-> (45) P_No_RXcm> = RCMZ*Cx> + RCMX*Cy> - RCMY*Cz>
 
-   (29) v_No_C> = 0>
--> (30) v_No_C> = 0>
+   (46) P_No_RYcm> = -RCMX*Cz> + RCMZ*Cy> + RCMY*Cx>
+-> (47) P_No_RYcm> = RCMY*Cx> + RCMZ*Cy> - RCMX*Cz>
 
-   (31) Ccm.SetVelocity(N, No)
--> (32) v_Ccm_N> = -(CCMX*cos(phi)+CCMY*sin(phi))*theta'*Cx> + CCMY*phi'*Cy>
+   (48) P_No_RZcm> = -RCMX*Cz> + RCMY*Cy> + RCMX*Cx>
+-> (49) P_No_RZcm> = RCMX*Cx> + RCMY*Cy> - RCMX*Cz>
+
+   (50) P_No_Scm> = (1/(mC + 3*mR))*(mR*P_No_RXcm> + mR*P_No_RYcm> + mR*P_No_RZcm> + mC*P_No_Ccm>)
+-> (51) P_No_Scm> = (mC*CCMZ+mR*RCMX+mR*RCMY+mR*RCMZ)/(mC+3*mR)*Cx> + (mC*CCMX+
+        mR*RCMX+mR*RCMY+mR*RCMZ)/(mC+3*mR)*Cy> - (mC*CCMY+mR*RCMY+2*mR*RCMX)/(
+        mC+3*mR)*Cz>
+
+   (52) % Find velocities of All CMs
+   (53) v_No_N> = 0>
+-> (54) v_No_N> = 0>
+
+   (55) v_No_C> = 0>
+-> (56) v_No_C> = 0>
+
+   (57) Ccm.SetVelocity(N, No)
+-> (58) v_Ccm_N> = -(CCMX*cos(phi)+CCMY*sin(phi))*theta'*Cx> + CCMY*phi'*Cy>
         + CCMX*phi'*Cz> + CCMZ*theta'*C1y>
 
-   (33) RXcm.SetVelocity(N, No)
--> (34) v_RXcm_N> = -(RCMX*cos(phi)+RCMY*sin(phi))*theta'*Cx> + RCMY*phi'*Cy>
+   (59) RXcm.SetVelocity(N, No)
+-> (60) v_RXcm_N> = -(RCMX*cos(phi)+RCMY*sin(phi))*theta'*Cx> + RCMY*phi'*Cy>
         + RCMX*phi'*Cz> + RCMZ*theta'*C1y>
 
-   (35) RYcm.SetVelocity(N, No)
--> (36) v_RYcm_N> = -(RCMX*sin(phi)+RCMZ*cos(phi))*theta'*Cx> + RCMX*phi'*Cy>
+   (61) RYcm.SetVelocity(N, No)
+-> (62) v_RYcm_N> = -(RCMX*sin(phi)+RCMZ*cos(phi))*theta'*Cx> + RCMX*phi'*Cy>
         + RCMZ*phi'*Cz> + RCMY*theta'*C1y>
 
-   (37) RZcm.SetVelocity(N, No)
--> (38) v_RZcm_N> = -(RCMX*sin(phi)+RCMY*cos(phi))*theta'*Cx> + RCMX*phi'*Cy>
+   (63) RZcm.SetVelocity(N, No)
+-> (64) v_RZcm_N> = -(RCMX*sin(phi)+RCMY*cos(phi))*theta'*Cx> + RCMX*phi'*Cy>
         + RCMY*phi'*Cz> + RCMX*theta'*C1y>
 
-   (39) % Set inertia dyadics
-   (40) C.SetInertia(No, CIXX, CIYY, CIZZ, CIXY, CIYZ, CIXZ) % Cube frame about No
-   (41) RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, RXIXY, RXIYZ, RXIXZ) % X Rotor about RXcm
-   (42) RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, RYIXY, RYIYZ, RYIXZ) % Y Rotor about RXcm
-   (43) RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, RZIYZ, RZIXZ) % Z Rotor about RXcm
-   (44) % CM Positions
-   (45) Input RCMX = 0.076 m, RCMY = 0.076 m, RCMZ = 0.007789 m
-   (46) Input CCMX = 0.072113 m, CCMY = 0.071399 m, CCMZ = 0.071467 m
-   (47) % Cube Inertia Dyadic about No
-   (48) Input CIXX = 0.011496398 kg*m^2, CIYY = 0.011603443 kg*m^2, CIZZ = 0.011600232 kg*m^2
-   (49) Input CIXY = -0.004360713 kg*m^2, CIXZ = 0.004366281 kg*m^2, CIYZ = 0.004314224 kg*m^2
-   (50) % Z Rotor inertia dyadic about RZcm
-   (51) cd "c:\Users\charl\Documents\GitHub\E175-Self-Balancing-Cube\motion_genesis"
-   (52) MotionGenesis cube.txt
+   (65) % Set inertia dyadics
+   (66) C.SetInertia(No, CIXX, CIYY, CIZZ, CIXY, CIYZ, CIXZ) % Cube frame about No
+   (67) RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, RXIXY, RXIYZ, RXIXZ) % X Rotor about RXcm
+   (68) RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, RYIXY, RYIYZ, RYIXZ) % Y Rotor about RXcm
+   (69) RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, RZIYZ, RZIXZ) % Z Rotor about RXcm
+   (70) % Calculate translational momentum
+   (71) L_C_N> = mC*V_Ccm_N>
+-> (72) L_C_N> = -mC*(CCMX*cos(phi)+CCMY*sin(phi))*theta'*Cx> + mC*CCMY*phi'*Cy>
+        + mC*CCMX*phi'*Cz> + mC*CCMZ*theta'*C1y>
+
+   (73) L_RX_N> = mR*V_RXcm_N>
+-> (74) L_RX_N> = -mR*(RCMX*cos(phi)+RCMY*sin(phi))*theta'*Cx> + mR*RCMY*phi'*Cy>
+        + mR*RCMX*phi'*Cz> + mR*RCMZ*theta'*C1y>
+
+   (75) L_RY_N> = mR*V_RYcm_N>
+-> (76) L_RY_N> = -mR*(RCMX*sin(phi)+RCMZ*cos(phi))*theta'*Cx> + mR*RCMX*phi'*Cy>
+        + mR*RCMZ*phi'*Cz> + mR*RCMY*theta'*C1y>
+
+   (77) L_RZ_N> = mR*V_RZcm_N>
+-> (78) L_RZ_N> = -mR*(RCMX*sin(phi)+RCMY*cos(phi))*theta'*Cx> + mR*RCMX*phi'*Cy>
+        + mR*RCMY*phi'*Cz> + mR*RCMX*theta'*C1y>
+
+   (79) % 

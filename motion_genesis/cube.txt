@@ -3,6 +3,7 @@ RigidFrame C1 % Define intermediate frame for rotations
 RigidBody C, RX, RY, RZ % Defines all bodies
 Variable theta'', phi'', qX'', qY'', qZ''
 Constant g, RCMX, RCMY, RCMZ, CCMX, CCMY, CCMZ
+Point Scm
 
 % Set component mass
 C.SetMass(mC)
@@ -22,6 +23,7 @@ P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
 P_No_RXcm> = -RCMY*Cz> + RCMX*Cy> + RCMZ*Cx>
 P_No_RYcm> = -RCMX*Cz> + RCMZ*Cy> + RCMY*Cx>
 P_No_RZcm> = -RCMX*Cz> + RCMY*Cy> + RCMX*Cx>
+P_No_Scm> = (1/(mC + 3*mR))*(mR*P_No_RXcm> + mR*P_No_RYcm> + mR*P_No_RZcm> + mC*P_No_Ccm>)
 
 % Find velocities of All CMs
 v_No_N> = 0>
@@ -37,8 +39,26 @@ RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, RXIXY, RXIYZ, RXIXZ) % X Rotor about RX
 RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, RYIXY, RYIYZ, RYIXZ) % Y Rotor about RXcm
 RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, RZIYZ, RZIXZ) % Z Rotor about RXcm
 
+% Calculate translational momentum
+L_C_N> = mC*V_Ccm_N>
+L_RX_N> = mR*V_RXcm_N>
+L_RY_N> = mR*V_RYcm_N>
+L_RZ_N> = mR*V_RZcm_N>
+
 % Calculate the angular momentums
 H_C_No_N> = Dot(I_C_No>>, w_C_N>)
+H_RX_No_N> = Dot(I_RX_RXcm>>, w_RX_N>) + Cross(P_No_RXcm>, L_RX_N>)
+H_RY_No_N> = Dot(I_RY_RYcm>>, w_RY_N>) + Cross(P_No_RYcm>, L_RY_N>)
+H_RZ_No_N> = Dot(I_RZ_RXcm>>, w_RZ_N>) + Cross(P_No_RZcm>, L_RZ_N>)
+
+% Forces on system
+FG_N> = -(mC+3*mR)*g*Ny>
+M_FG_No_N> = Cross(P_No_Scm>, FG_N>)
+
+% Solve system of equations
+zero[1] = Dot(DT(H_C_No_N> + H_RX_No_N> + H_RY_No_N> + H_RZ_No_N>, N ) - M_FG_No_N>, Nz>)
+zero[2] = Dot(DT(H_C_No_N> + H_RX_No_N> + H_RY_No_N> + H_RZ_No_N>, N ) - M_FG_No_N>, Nx>)
+Solve(zero, theta'', phi'')
 
 % CM Positions
 Input RCMX = 0.076 m, RCMY = 0.076 m, RCMZ = 0.007789 m
@@ -59,8 +79,3 @@ Input RXIXY = 8.33e-14 kg*m^2, RXIXZ = -3.587e-14 kg*m^2, RXIYZ = -0.000000127 k
 % Y Rotor inertia dyadic about RYcm
 Input RYIXX = 0.000087197 kg*m^2, RYIYY = 0.000173232 kg*m^2, RYIZZ = 0.000086943 kg*m^2
 Input RYIXY = 3.587e-14 kg*m^2, RYIXZ = -0.000000127 kg*m^2, RYIYZ = -8.33e-14 kg*m^2
-
-
-
-
-
