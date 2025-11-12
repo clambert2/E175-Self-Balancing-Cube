@@ -1,0 +1,516 @@
+   (1) NewtonianFrame N % Ground frame
+   (2) RigidFrame C1, C2 % Define intermediate frame for rotations
+   (3) RigidBody C, RX, RY, RZ % Defines all bodies
+   (4) Variable theta'', phi'', psi'', qX'', qY'', qZ''
+   (5) Constant g, RCMX, RCMY, RCMZ, CCMX, CCMY, CCMZ
+   (6) Point Scm
+   (7) % Set component mass
+   (8) C.SetMass(mC)
+   (9) RX.SetMass(mR)
+   (10) RY.SetMass(mR)
+   (11) RZ.SetMass(mR)
+   (12) % Define rotations
+   (13) C1.RotateZ(N, theta)
+-> (14) C1_N = [cos(theta), sin(theta), 0;  -sin(theta), cos(theta), 0;  0, 0, 1]
+-> (15) w_C1_N> = theta'*C1z>
+-> (16) alf_C1_N> = theta''*C1z>
+
+   (17) C2.RotateX(C1, phi)
+-> (18) C2_C1 = [1, 0, 0;  0, cos(phi), sin(phi);  0, -sin(phi), cos(phi)]
+-> (19) w_C2_C1> = phi'*C2x>
+-> (20) w_C2_N> = theta'*C1z> + phi'*C2x>
+-> (21) alf_C2_C1> = phi''*C2x>
+-> (22) alf_C2_N> = phi'*theta'*C1y> + theta''*C1z> + phi''*C2x>
+
+   (23) C.Rotate(C2, Ny>, psi)
+-> (24) C_C2[1,1] = cos(psi) + sin(theta)^2*(1-cos(psi))
+-> (25) C_C2[1,2] = -cos(theta)*(sin(phi)*sin(psi)-sin(theta)*cos(phi)*(1-cos(
+        psi)))
+-> (26) C_C2[1,3] = -cos(theta)*(sin(psi)*cos(phi)+sin(phi)*sin(theta)*(1-cos(
+        psi)))
+-> (27) C_C2[2,1] = cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(
+        psi)))
+-> (28) C_C2[2,2] = cos(psi) + cos(phi)^2*cos(theta)^2*(1-cos(psi))
+-> (29) C_C2[2,3] = sin(psi)*sin(theta) - sin(phi)*cos(phi)*cos(theta)^2*(1-cos
+        (psi))
+-> (30) C_C2[3,1] = cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(
+        psi)))
+-> (31) C_C2[3,2] = -sin(psi)*sin(theta) - sin(phi)*cos(phi)*cos(theta)^2*(1-
+        cos(psi))
+-> (32) C_C2[3,3] = cos(psi) + sin(phi)^2*cos(theta)^2*(1-cos(psi))
+-> (33) w_C_C2> = psi'*Ny>
+-> (34) w_C_N> = theta'*C1z> + phi'*C2x> + psi'*Ny>
+-> (35) alf_C_C2> = psi''*Ny>
+-> (36) alf_C_N> = phi'*theta'*C1y> + (cos(theta)*phi'*psi'+theta'')*C1z>
+        + phi''*C2x> - psi'*theta'*Nx> + psi''*Ny>
+
+   (37) RX.RotateX(C, qX)
+-> (38) RX_C = [1, 0, 0;  0, cos(qX), sin(qX);  0, -sin(qX), cos(qX)]
+-> (39) w_RX_C> = qX'*RXx>
+-> (40) w_RX_N> = theta'*C1z> + phi'*C2x> + psi'*Ny> + qX'*RXx>
+-> (41) alf_RX_C> = qX''*RXx>
+-> (42) alf_RX_N> = phi'*theta'*C1y> + (cos(theta)*phi'*psi'+theta'')*C1z>
+        + phi''*C2x> - psi'*theta'*Nx> + psi''*Ny> + qX''*RXx> - qX'*(cos(theta)
+        *sin(phi+qX)*psi'+(sin(qX)*(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(
+        phi))-cos(qX)*(cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta)))*theta'+
+        cos(theta)*(sin(qX)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))
+        -cos(qX)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi))))*phi')*RXy>
+        - qX'*(cos(theta)*cos(phi+qX)*psi'+(cos(qX)*(sin(phi)*cos(psi)+sin(psi)
+        *sin(theta)*cos(phi))+sin(qX)*(cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(
+        theta)))*theta'+cos(theta)*(cos(qX)*(sin(phi)*sin(psi)+sin(theta)*cos(
+        phi)*(1-cos(psi)))+sin(qX)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-
+        cos(psi))))*phi')*RXz>
+
+   (43) RY.RotateY(C, qY)
+-> (44) RY_C = [cos(qY), 0, -sin(qY);  0, 1, 0;  sin(qY), 0, cos(qY)]
+-> (45) w_RY_C> = qY'*RYy>
+-> (46) w_RY_N> = theta'*C1z> + phi'*C2x> + psi'*Ny> + qY'*RYy>
+-> (47) alf_RY_C> = qY''*RYy>
+-> (48) alf_RY_N> = phi'*theta'*C1y> + (cos(theta)*phi'*psi'+theta'')*C1z>
+        + phi''*C2x> - psi'*theta'*Nx> + psi''*Ny> + qY'*((sin(psi)*sin(qY)*cos
+        (theta)-cos(qY)*(cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta)))*thet
+        a'-(sin(qY)*sin(theta)-sin(phi)*cos(qY)*cos(theta))*psi'-(sin(qY)*(cos(
+        psi)+sin(theta)^2*(1-cos(psi)))+cos(qY)*cos(theta)*(sin(psi)*cos(phi)-
+        sin(phi)*sin(theta)*(1-cos(psi))))*phi')*RYx> + qY''*RYy> - qY'*((sin(
+        psi)*cos(qY)*cos(theta)+sin(qY)*(cos(phi)*cos(psi)-sin(phi)*sin(psi)*
+        sin(theta)))*theta'-(sin(theta)*cos(qY)+sin(phi)*sin(qY)*cos(theta))*
+        psi'-(cos(qY)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-sin(qY)*cos(theta)*(
+        sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi))))*phi')*RYz>
+
+   (49) RZ.RotateZ(C, qZ)
+-> (50) RZ_C = [cos(qZ), sin(qZ), 0;  -sin(qZ), cos(qZ), 0;  0, 0, 1]
+-> (51) w_RZ_C> = qZ'*RZz>
+-> (52) w_RZ_N> = theta'*C1z> + phi'*C2x> + psi'*Ny> + qZ'*RZz>
+-> (53) alf_RZ_C> = qZ''*RZz>
+-> (54) alf_RZ_N> = phi'*theta'*C1y> + (cos(theta)*phi'*psi'+theta'')*C1z>
+        + phi''*C2x> - psi'*theta'*Nx> + psi''*Ny> + qZ'*((sin(psi)*sin(qZ)*cos
+        (theta)+cos(qZ)*(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi)))*thet
+        a'-(sin(qZ)*sin(theta)-cos(phi)*cos(qZ)*cos(theta))*psi'-(sin(qZ)*(cos(
+        psi)+sin(theta)^2*(1-cos(psi)))-cos(qZ)*cos(theta)*(sin(phi)*sin(psi)+
+        sin(theta)*cos(phi)*(1-cos(psi))))*phi')*RZx> + qZ'*((sin(psi)*cos(qZ)*
+        cos(theta)-sin(qZ)*(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi)))*
+        theta'-(sin(theta)*cos(qZ)+sin(qZ)*cos(phi)*cos(theta))*psi'-(cos(qZ)*(
+        cos(psi)+sin(theta)^2*(1-cos(psi)))+sin(qZ)*cos(theta)*(sin(phi)*sin(
+        psi)+sin(theta)*cos(phi)*(1-cos(psi))))*phi')*RZy> + qZ''*RZz>
+
+   (55) % Define distances between points
+   (56) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
+-> (57) P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
+
+   (58) P_No_RXcm> = -RCMY*Cz> + RCMX*Cy> + RCMZ*Cx>
+-> (59) P_No_RXcm> = RCMZ*Cx> + RCMX*Cy> - RCMY*Cz>
+
+   (60) P_No_RYcm> = -RCMX*Cz> + RCMZ*Cy> + RCMY*Cx>
+-> (61) P_No_RYcm> = RCMY*Cx> + RCMZ*Cy> - RCMX*Cz>
+
+   (62) P_No_RZcm> = -RCMX*Cz> + RCMY*Cy> + RCMX*Cx>
+-> (63) P_No_RZcm> = RCMX*Cx> + RCMY*Cy> - RCMX*Cz>
+
+   (64) P_No_Scm> = (1/(mC + 3*mR))*(mR*P_No_RXcm> + mR*P_No_RYcm> + mR*P_No_RZcm> + mC*P_No_Ccm>)
+-> (65) P_No_Scm> = (mC*CCMZ+mR*RCMX+mR*RCMY+mR*RCMZ)/(mC+3*mR)*Cx> + (mC*CCMX+
+        mR*RCMX+mR*RCMY+mR*RCMZ)/(mC+3*mR)*Cy> - (mC*CCMY+mR*RCMY+2*mR*RCMX)/(
+        mC+3*mR)*Cz>
+
+   (66) % Find velocities of All CMs
+   (67) v_No_N> = 0>
+-> (68) v_No_N> = 0>
+
+   (69) v_No_C> = 0>
+-> (70) v_No_C> = 0>
+
+   (71) Ccm.SetVelocity(N, No)
+-> (72) v_Ccm_N> = (CCMX*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)*
+        sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(
+        theta)*(1-cos(psi)))*phi')-CCMY*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos
+        (psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)
+        +sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cx> + (-CCMY*(sin(psi)*cos(
+        theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')
+        -CCMZ*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)*sin(psi)*
+        sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1
+        -cos(psi)))*phi'))*Cy> + (-CCMX*(sin(psi)*cos(theta)*theta'-sin(theta)*
+        psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')-CCMZ*(cos(phi)*cos(the
+        ta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(
+        theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cz>
+
+   (73) RXcm.SetVelocity(N, No)
+-> (74) v_RXcm_N> = (RCMX*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)
+        *sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin
+        (theta)*(1-cos(psi)))*phi')-RCMY*(cos(phi)*cos(theta)*psi'+(sin(phi)*
+        cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(
+        psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cx> + (-RCMY*(sin(psi)*
+        cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*
+        phi')-RCMZ*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)*sin(
+        psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(the
+        ta)*(1-cos(psi)))*phi'))*Cy> + (-RCMX*(sin(psi)*cos(theta)*theta'-sin(
+        theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')-RCMZ*(cos(phi)*
+        cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'
+        +cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cz>
+
+   (75) RYcm.SetVelocity(N, No)
+-> (76) v_RYcm_N> = (RCMZ*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)
+        *sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin
+        (theta)*(1-cos(psi)))*phi')-RCMX*(cos(phi)*cos(theta)*psi'+(sin(phi)*
+        cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(
+        psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cx> + (-RCMX*(sin(psi)*
+        cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*
+        phi')-RCMY*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)*sin(
+        psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(the
+        ta)*(1-cos(psi)))*phi'))*Cy> + (-RCMZ*(sin(psi)*cos(theta)*theta'-sin(
+        theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')-RCMY*(cos(phi)*
+        cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'
+        +cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cz>
+
+   (77) RZcm.SetVelocity(N, No)
+-> (78) v_RZcm_N> = (RCMY*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)
+        *sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin
+        (theta)*(1-cos(psi)))*phi')-RCMX*(cos(phi)*cos(theta)*psi'+(sin(phi)*
+        cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(
+        psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cx> - RCMX*(sin(phi)*cos(
+        theta)*psi'+sin(psi)*cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(
+        theta)^2*(1-cos(psi)))*phi'-(cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(
+        theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos
+        (psi)))*phi')*Cy> + (-RCMY*(sin(psi)*cos(theta)*theta'-sin(theta)*psi'-
+        (cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')-RCMX*(cos(phi)*cos(theta)*
+        psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)
+        *(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cz>
+
+   (79) % Set inertia dyadics
+   (80) C.SetInertia(No, CIXX, CIYY, CIZZ, CIXY, CIYZ, CIXZ) % Cube frame about No
+   (81) RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, RXIXY, RXIYZ, RXIXZ) % X Rotor about RXcm
+   (82) RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, RYIXY, RYIYZ, RYIXZ) % Y Rotor about RXcm NEED TO DEFINE THESE IN THE C Frame so there is no rotation matrix needed
+   (83) RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, RZIYZ, RZIXZ) % Z Rotor about RXcm
+   (84) % Calculate translational momentum
+   (85) L_C_N> = mC*V_Ccm_N>
+-> (86) L_C_N> = -mC*(CCMY*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)
+        *sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)+sin(theta)*
+        cos(phi)*(1-cos(psi)))*phi')-CCMX*(sin(phi)*cos(theta)*psi'-(cos(phi)*
+        cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(
+        phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi'))*Cx> - mC*(CCMY*(sin(psi)*
+        cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*
+        phi')+CCMZ*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)*sin(
+        psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(the
+        ta)*(1-cos(psi)))*phi'))*Cy> - mC*(CCMX*(sin(psi)*cos(theta)*theta'-sin
+        (theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+CCMZ*(cos(phi)*
+        cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'
+        +cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cz>
+
+   (87) L_RX_N> = mR*V_RXcm_N>
+-> (88) L_RX_N> = -mR*(RCMY*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(
+        psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)+sin(the
+        ta)*cos(phi)*(1-cos(psi)))*phi')-RCMX*(sin(phi)*cos(theta)*psi'-(cos(
+        phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)
+        *cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi'))*Cx> - mR*(RCMY*(sin(
+        psi)*cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(
+        psi)))*phi')+RCMZ*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)
+        *sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin
+        (theta)*(1-cos(psi)))*phi'))*Cy> - mR*(RCMX*(sin(psi)*cos(theta)*theta'
+        -sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+RCMZ*(cos(
+        phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*
+        theta'+cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*
+        phi'))*Cz>
+
+   (89) L_RY_N> = mR*V_RYcm_N>
+-> (90) L_RY_N> = -mR*(RCMX*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(
+        psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)+sin(the
+        ta)*cos(phi)*(1-cos(psi)))*phi')-RCMZ*(sin(phi)*cos(theta)*psi'-(cos(
+        phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)
+        *cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi'))*Cx> - mR*(RCMX*(sin(
+        psi)*cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(
+        psi)))*phi')+RCMY*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)
+        *sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin
+        (theta)*(1-cos(psi)))*phi'))*Cy> - mR*(RCMZ*(sin(psi)*cos(theta)*theta'
+        -sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+RCMY*(cos(
+        phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*
+        theta'+cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*
+        phi'))*Cz>
+
+   (91) L_RZ_N> = mR*V_RZcm_N>
+-> (92) L_RZ_N> = -mR*(RCMX*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(
+        psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)+sin(the
+        ta)*cos(phi)*(1-cos(psi)))*phi')-RCMY*(sin(phi)*cos(theta)*psi'-(cos(
+        phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)
+        *cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi'))*Cx> - mR*RCMX*(sin(
+        phi)*cos(theta)*psi'+sin(psi)*cos(theta)*theta'-sin(theta)*psi'-(cos(
+        psi)+sin(theta)^2*(1-cos(psi)))*phi'-(cos(phi)*cos(psi)-sin(phi)*sin(
+        psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(the
+        ta)*(1-cos(psi)))*phi')*Cy> - mR*(RCMY*(sin(psi)*cos(theta)*theta'-sin(
+        theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+RCMX*(cos(phi)*
+        cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'
+        +cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))*Cz>
+
+   (93) % Calculate the angular momentums
+   (94) H_C_No_N> = Dot(I_C_No>>, w_C_N>)
+-> (95) H_C_No_N> = (CIXX*sin(theta)*psi'+CIXY*cos(phi)*cos(theta)*psi'+CIXX*(
+        cos(psi)+sin(theta)^2*(1-cos(psi)))*phi'+CIXY*(sin(phi)*cos(psi)+sin(
+        psi)*sin(theta)*cos(phi))*theta'+CIXZ*(cos(phi)*cos(psi)-sin(phi)*sin(
+        psi)*sin(theta))*theta'+CIXY*cos(theta)*(sin(phi)*sin(psi)+sin(theta)*
+        cos(phi)*(1-cos(psi)))*phi'+CIXZ*cos(theta)*(sin(psi)*cos(phi)-sin(phi)
+        *sin(theta)*(1-cos(psi)))*phi'-CIXX*sin(psi)*cos(theta)*theta'-CIXZ*sin
+        (phi)*cos(theta)*psi')*Cx> + (CIXY*sin(theta)*psi'+CIYY*cos(phi)*cos(
+        theta)*psi'+CIXY*(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi'+CIYY*(sin(
+        phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+CIYZ*(cos(phi)*cos(
+        psi)-sin(phi)*sin(psi)*sin(theta))*theta'+CIYY*cos(theta)*(sin(phi)*sin
+        (psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'+CIYZ*cos(theta)*(sin(psi)*
+        cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi'-CIXY*sin(psi)*cos(theta)
+        *theta'-CIYZ*sin(phi)*cos(theta)*psi')*Cy> + (CIXZ*sin(theta)*psi'+CIYZ
+        *cos(phi)*cos(theta)*psi'+CIXZ*(cos(psi)+sin(theta)^2*(1-cos(psi)))*ph
+        i'+CIYZ*(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+CIZZ*(
+        cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'+CIYZ*cos(theta)*
+        (sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'+CIZZ*cos(the
+        ta)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi'-CIXZ*sin(
+        psi)*cos(theta)*theta'-CIZZ*sin(phi)*cos(theta)*psi')*Cz>
+
+   (96) H_RX_No_N> = Dot(I_RX_RXcm>>, w_RX_N>) + Cross(P_No_RXcm>, L_RX_N>)
+-> (97) H_RX_No_N> = mR*(RCMZ*(RCMX*(sin(psi)*cos(theta)*theta'-sin(theta)*psi'
+        -(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+RCMZ*(cos(phi)*cos(theta)*
+        psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)
+        *(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))+RCMY*(RCMY
+        *(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(
+        phi))*theta'+cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(
+        psi)))*phi')-RCMX*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)
+        *sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin
+        (theta)*(1-cos(psi)))*phi')))*Cy> - mR*(RCMZ*(RCMY*(sin(psi)*cos(theta)
+        *theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+RCMZ
+        *(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(th
+        eta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(
+        psi)))*phi'))-RCMX*(RCMY*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+
+        sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)+sin(
+        theta)*cos(phi)*(1-cos(psi)))*phi')-RCMX*(sin(phi)*cos(theta)*psi'-(cos
+        (phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)
+        *cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi')))*Cz> + (RXIXX*qX'+
+        RXIXX*sin(theta)*psi'+RXIXX*(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi'+
+        RXIXY*(cos(phi)*(sin(qX)*cos(psi)+sin(psi)*sin(theta)*cos(qX))+sin(phi)
+        *(cos(psi)*cos(qX)-sin(psi)*sin(qX)*sin(theta)))*theta'+RXIXY*cos(theta)
+        *(cos(qX)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))+sin(qX)*
+        (sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi))))*phi'+RXIXY*cos(
+        theta)*(sin(theta)^2*cos(phi+qX)*(1-cos(psi))+sin(phi)*(sin(phi)*cos(
+        phi)*cos(qX)*cos(theta)^2*(1-cos(psi))-sin(qX)*(cos(psi)+sin(phi)^2*cos
+        (theta)^2*(1-cos(psi))))-cos(phi)*(sin(phi)*sin(qX)*cos(phi)*cos(theta)^2
+        *(1-cos(psi))-cos(qX)*(cos(psi)+cos(phi)^2*cos(theta)^2*(1-cos(psi)))))
+        *psi'-RXIXX*sin(psi)*cos(theta)*theta'-RXIXZ*(sin(phi)*(sin(qX)*cos(psi)
+        +sin(psi)*sin(theta)*cos(qX))-cos(phi)*(cos(psi)*cos(qX)-sin(psi)*sin(
+        qX)*sin(theta)))*theta'-RXIXZ*cos(theta)*(sin(qX)*(sin(phi)*sin(psi)+
+        sin(theta)*cos(phi)*(1-cos(psi)))-cos(qX)*(sin(psi)*cos(phi)-sin(phi)*
+        sin(theta)*(1-cos(psi))))*phi'-RXIXZ*cos(theta)*(sin(phi+qX)*sin(theta)^2
+        *(1-cos(psi))+sin(phi)*(sin(phi)*sin(qX)*cos(phi)*cos(theta)^2*(1-cos(
+        psi))+cos(qX)*(cos(psi)+sin(phi)^2*cos(theta)^2*(1-cos(psi))))+cos(phi)
+        *(sin(phi)*cos(phi)*cos(qX)*cos(theta)^2*(1-cos(psi))+sin(qX)*(cos(psi)
+        +cos(phi)^2*cos(theta)^2*(1-cos(psi)))))*psi'-mR*(RCMX*(RCMX*(sin(psi)*
+        cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*
+        phi')+RCMZ*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(
+        theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(
+        phi)*(1-cos(psi)))*phi'))+RCMY*(RCMY*(sin(psi)*cos(theta)*theta'-sin(
+        theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+RCMZ*(sin(phi)*
+        cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'
+        -cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi'))))*RXx>
+        + (RXIXY*qX'+RXIXY*sin(theta)*psi'+RXIXY*(cos(psi)+sin(theta)^2*(1-cos(
+        psi)))*phi'+RXIYY*(cos(phi)*(sin(qX)*cos(psi)+sin(psi)*sin(theta)*cos(
+        qX))+sin(phi)*(cos(psi)*cos(qX)-sin(psi)*sin(qX)*sin(theta)))*theta'+
+        RXIYY*cos(theta)*(cos(qX)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos
+        (psi)))+sin(qX)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi))))*
+        phi'+RXIYY*cos(theta)*(sin(theta)^2*cos(phi+qX)*(1-cos(psi))+sin(phi)*(
+        sin(phi)*cos(phi)*cos(qX)*cos(theta)^2*(1-cos(psi))-sin(qX)*(cos(psi)+
+        sin(phi)^2*cos(theta)^2*(1-cos(psi))))-cos(phi)*(sin(phi)*sin(qX)*cos(
+        phi)*cos(theta)^2*(1-cos(psi))-cos(qX)*(cos(psi)+cos(phi)^2*cos(theta)^2
+        *(1-cos(psi)))))*psi'-RXIXY*sin(psi)*cos(theta)*theta'-RXIYZ*(sin(phi)*
+        (sin(qX)*cos(psi)+sin(psi)*sin(theta)*cos(qX))-cos(phi)*(cos(psi)*cos(
+        qX)-sin(psi)*sin(qX)*sin(theta)))*theta'-RXIYZ*cos(theta)*(sin(qX)*(sin
+        (phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))-cos(qX)*(sin(psi)*cos(
+        phi)-sin(phi)*sin(theta)*(1-cos(psi))))*phi'-RXIYZ*cos(theta)*(sin(phi+
+        qX)*sin(theta)^2*(1-cos(psi))+sin(phi)*(sin(phi)*sin(qX)*cos(phi)*cos(
+        theta)^2*(1-cos(psi))+cos(qX)*(cos(psi)+sin(phi)^2*cos(theta)^2*(1-cos(
+        psi))))+cos(phi)*(sin(phi)*cos(phi)*cos(qX)*cos(theta)^2*(1-cos(psi))+
+        sin(qX)*(cos(psi)+cos(phi)^2*cos(theta)^2*(1-cos(psi)))))*psi')*RXy>
+        + (RXIXZ*qX'+RXIXZ*sin(theta)*psi'+RXIXZ*(cos(psi)+sin(theta)^2*(1-cos(
+        psi)))*phi'+RXIYZ*(cos(phi)*(sin(qX)*cos(psi)+sin(psi)*sin(theta)*cos(
+        qX))+sin(phi)*(cos(psi)*cos(qX)-sin(psi)*sin(qX)*sin(theta)))*theta'+
+        RXIYZ*cos(theta)*(cos(qX)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos
+        (psi)))+sin(qX)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi))))*
+        phi'+RXIYZ*cos(theta)*(sin(theta)^2*cos(phi+qX)*(1-cos(psi))+sin(phi)*(
+        sin(phi)*cos(phi)*cos(qX)*cos(theta)^2*(1-cos(psi))-sin(qX)*(cos(psi)+
+        sin(phi)^2*cos(theta)^2*(1-cos(psi))))-cos(phi)*(sin(phi)*sin(qX)*cos(
+        phi)*cos(theta)^2*(1-cos(psi))-cos(qX)*(cos(psi)+cos(phi)^2*cos(theta)^2
+        *(1-cos(psi)))))*psi'-RXIXZ*sin(psi)*cos(theta)*theta'-RXIZZ*(sin(phi)*
+        (sin(qX)*cos(psi)+sin(psi)*sin(theta)*cos(qX))-cos(phi)*(cos(psi)*cos(
+        qX)-sin(psi)*sin(qX)*sin(theta)))*theta'-RXIZZ*cos(theta)*(sin(qX)*(sin
+        (phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))-cos(qX)*(sin(psi)*cos(
+        phi)-sin(phi)*sin(theta)*(1-cos(psi))))*phi'-RXIZZ*cos(theta)*(sin(phi+
+        qX)*sin(theta)^2*(1-cos(psi))+sin(phi)*(sin(phi)*sin(qX)*cos(phi)*cos(
+        theta)^2*(1-cos(psi))+cos(qX)*(cos(psi)+sin(phi)^2*cos(theta)^2*(1-cos(
+        psi))))+cos(phi)*(sin(phi)*cos(phi)*cos(qX)*cos(theta)^2*(1-cos(psi))+
+        sin(qX)*(cos(psi)+cos(phi)^2*cos(theta)^2*(1-cos(psi)))))*psi')*RXz>
+
+   (98) H_RY_No_N> = Dot(I_RY_RYcm>>, w_RY_N>) + Cross(P_No_RYcm>, L_RY_N>)
+-> (99) H_RY_No_N> = -mR*(RCMZ*(RCMZ*(sin(psi)*cos(theta)*theta'-sin(theta)*ps
+        i'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+RCMY*(cos(phi)*cos(theta)
+        *psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)
+        *(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))+RCMX*(RCMX
+        *(sin(psi)*cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-
+        cos(psi)))*phi')+RCMY*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(
+        phi)*sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)
+        *sin(theta)*(1-cos(psi)))*phi')))*Cx> - mR*(RCMY*(RCMX*(sin(psi)*cos(
+        theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')
+        +RCMY*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)*sin(psi)*
+        sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1
+        -cos(psi)))*phi'))-RCMZ*(RCMX*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(
+        psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)
+        +sin(theta)*cos(phi)*(1-cos(psi)))*phi')-RCMZ*(sin(phi)*cos(theta)*psi'
+        -(cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'-cos(theta)*(
+        sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi')))*Cz> + (RYI
+        XY*qY'+RYIXY*cos(phi)*cos(theta)*psi'+RYIXY*(sin(phi)*cos(psi)+sin(psi)
+        *sin(theta)*cos(phi))*theta'+RYIXY*cos(theta)*(sin(phi)*sin(psi)+sin(
+        theta)*cos(phi)*(1-cos(psi)))*phi'+RYIXZ*(cos(phi)*cos(psi)*cos(qY)-sin
+        (psi)*sin(qY)*cos(theta)-sin(phi)*sin(psi)*sin(theta)*cos(qY))*theta'+
+        RYIXZ*(sin(qY)*(cos(psi)+sin(theta)^2*(1-cos(psi)))+cos(qY)*cos(theta)*
+        (sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi))))*phi'+RYIXX*(cos(
+        qY)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-sin(qY)*cos(theta)*(sin(psi)*
+        cos(phi)-sin(phi)*sin(theta)*(1-cos(psi))))*phi'+RYIXX*(sin(theta)*(cos
+        (qY)*(cos(psi)+sin(theta)^2*(1-cos(psi)))+sin(phi)*sin(qY)*sin(theta)*
+        cos(theta)*(1-cos(psi)))+cos(theta)*(sin(theta)*cos(qY)*cos(theta)*(1-
+        cos(psi))+sin(phi)*sin(qY)*cos(phi)^2*cos(theta)^2*(1-cos(psi))+sin(phi)
+        *sin(qY)*(cos(psi)+sin(phi)^2*cos(theta)^2*(1-cos(psi)))))*psi'+RYIXZ*(
+        sin(theta)*(sin(qY)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-sin(phi)*sin(
+        theta)*cos(qY)*cos(theta)*(1-cos(psi)))+cos(theta)*(sin(qY)*sin(theta)*
+        cos(theta)*(1-cos(psi))-sin(phi)*cos(qY)*cos(phi)^2*cos(theta)^2*(1-cos
+        (psi))-sin(phi)*cos(qY)*(cos(psi)+sin(phi)^2*cos(theta)^2*(1-cos(psi)))))
+        *psi'-RYIXX*(sin(psi)*cos(qY)*cos(theta)+sin(qY)*cos(phi)*cos(psi)-sin(
+        phi)*sin(psi)*sin(qY)*sin(theta))*theta')*RYx> + (RYIYY*qY'+RYIYY*cos(
+        phi)*cos(theta)*psi'+RYIYY*(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(
+        phi))*theta'+RYIYY*cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1
+        -cos(psi)))*phi'+RYIYZ*(cos(phi)*cos(psi)*cos(qY)-sin(psi)*sin(qY)*cos(
+        theta)-sin(phi)*sin(psi)*sin(theta)*cos(qY))*theta'+RYIYZ*(sin(qY)*(cos
+        (psi)+sin(theta)^2*(1-cos(psi)))+cos(qY)*cos(theta)*(sin(psi)*cos(phi)-
+        sin(phi)*sin(theta)*(1-cos(psi))))*phi'+RYIXY*(cos(qY)*(cos(psi)+sin(
+        theta)^2*(1-cos(psi)))-sin(qY)*cos(theta)*(sin(psi)*cos(phi)-sin(phi)*
+        sin(theta)*(1-cos(psi))))*phi'+RYIXY*(sin(theta)*(cos(qY)*(cos(psi)+sin
+        (theta)^2*(1-cos(psi)))+sin(phi)*sin(qY)*sin(theta)*cos(theta)*(1-cos(
+        psi)))+cos(theta)*(sin(theta)*cos(qY)*cos(theta)*(1-cos(psi))+sin(phi)*
+        sin(qY)*cos(phi)^2*cos(theta)^2*(1-cos(psi))+sin(phi)*sin(qY)*(cos(psi)
+        +sin(phi)^2*cos(theta)^2*(1-cos(psi)))))*psi'+RYIYZ*(sin(theta)*(sin(
+        qY)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-sin(phi)*sin(theta)*cos(qY)*
+        cos(theta)*(1-cos(psi)))+cos(theta)*(sin(qY)*sin(theta)*cos(theta)*(1-
+        cos(psi))-sin(phi)*cos(qY)*cos(phi)^2*cos(theta)^2*(1-cos(psi))-sin(phi)
+        *cos(qY)*(cos(psi)+sin(phi)^2*cos(theta)^2*(1-cos(psi)))))*psi'+mR*(RC
+        MY*(RCMZ*(sin(psi)*cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(the
+        ta)^2*(1-cos(psi)))*phi')+RCMY*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(
+        psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)
+        +sin(theta)*cos(phi)*(1-cos(psi)))*phi'))+RCMX*(RCMX*(cos(phi)*cos(the
+        ta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(
+        theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi')-RCMZ*
+        (sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(the
+        ta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(
+        psi)))*phi')))-RYIXY*(sin(psi)*cos(qY)*cos(theta)+sin(qY)*cos(phi)*cos(
+        psi)-sin(phi)*sin(psi)*sin(qY)*sin(theta))*theta')*RYy> + (RYIYZ*qY'+
+        RYIYZ*cos(phi)*cos(theta)*psi'+RYIYZ*(sin(phi)*cos(psi)+sin(psi)*sin(
+        theta)*cos(phi))*theta'+RYIYZ*cos(theta)*(sin(phi)*sin(psi)+sin(theta)*
+        cos(phi)*(1-cos(psi)))*phi'+RYIZZ*(cos(phi)*cos(psi)*cos(qY)-sin(psi)*
+        sin(qY)*cos(theta)-sin(phi)*sin(psi)*sin(theta)*cos(qY))*theta'+RYIZZ*(
+        sin(qY)*(cos(psi)+sin(theta)^2*(1-cos(psi)))+cos(qY)*cos(theta)*(sin(
+        psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi))))*phi'+RYIXZ*(cos(qY)*(
+        cos(psi)+sin(theta)^2*(1-cos(psi)))-sin(qY)*cos(theta)*(sin(psi)*cos(
+        phi)-sin(phi)*sin(theta)*(1-cos(psi))))*phi'+RYIXZ*(sin(theta)*(cos(qY)
+        *(cos(psi)+sin(theta)^2*(1-cos(psi)))+sin(phi)*sin(qY)*sin(theta)*cos(
+        theta)*(1-cos(psi)))+cos(theta)*(sin(theta)*cos(qY)*cos(theta)*(1-cos(
+        psi))+sin(phi)*sin(qY)*cos(phi)^2*cos(theta)^2*(1-cos(psi))+sin(phi)*
+        sin(qY)*(cos(psi)+sin(phi)^2*cos(theta)^2*(1-cos(psi)))))*psi'+RYIZZ*(
+        sin(theta)*(sin(qY)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-sin(phi)*sin(
+        theta)*cos(qY)*cos(theta)*(1-cos(psi)))+cos(theta)*(sin(qY)*sin(theta)*
+        cos(theta)*(1-cos(psi))-sin(phi)*cos(qY)*cos(phi)^2*cos(theta)^2*(1-cos
+        (psi))-sin(phi)*cos(qY)*(cos(psi)+sin(phi)^2*cos(theta)^2*(1-cos(psi)))))
+        *psi'-RYIXZ*(sin(psi)*cos(qY)*cos(theta)+sin(qY)*cos(phi)*cos(psi)-sin(
+        phi)*sin(psi)*sin(qY)*sin(theta))*theta')*RYz>
+
+   (100) H_RZ_No_N> = Dot(I_RZ_RZcm>>, w_RZ_N>) + Cross(P_No_RZcm>, L_RZ_N>)
+-> (101) H_RZ_No_N> = -mR*(RCMY*(RCMY*(sin(psi)*cos(theta)*theta'-sin(theta)*
+         psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+RCMX*(cos(phi)*cos(th
+         eta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*cos(phi))*theta'+cos(
+         theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi)))*phi'))+RCMX^2
+         *(sin(phi)*cos(theta)*psi'+sin(psi)*cos(theta)*theta'-sin(theta)*psi'-
+         (cos(psi)+sin(theta)^2*(1-cos(psi)))*phi'-(cos(phi)*cos(psi)-sin(phi)*
+         sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(phi)*sin
+         (theta)*(1-cos(psi)))*phi'))*Cx> + mR*RCMX*(RCMY*(sin(psi)*cos(theta)*
+         theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))*phi')+2*
+         RCMX*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*
+         cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-
+         cos(psi)))*phi')-RCMY*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin
+         (phi)*sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(
+         phi)*sin(theta)*(1-cos(psi)))*phi'))*Cy> + (RZIXZ*qZ'+RZIXZ*(cos(phi)*
+         cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'+RZIXZ*cos(theta)*(sin(
+         psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi'+RZIXY*(sin(phi)*
+         cos(psi)*cos(qZ)+sin(psi)*sin(qZ)*cos(theta)+sin(psi)*sin(theta)*cos(
+         phi)*cos(qZ))*theta'+RZIXX*(cos(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))
+         +sin(qZ)*cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi))))
+         *phi'+RZIXX*(sin(theta)*(cos(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))+
+         sin(qZ)*sin(theta)*cos(phi)*cos(theta)*(1-cos(psi)))+cos(theta)*(sin(
+         theta)*cos(qZ)*cos(theta)*(1-cos(psi))+sin(qZ)*cos(phi)*sin(phi)^2*cos
+         (theta)^2*(1-cos(psi))+sin(qZ)*cos(phi)*(cos(psi)+cos(phi)^2*cos(theta)^2
+         *(1-cos(psi)))))*psi'-RZIXZ*sin(phi)*cos(theta)*psi'-RZIXX*(sin(psi)*
+         cos(qZ)*cos(theta)-sin(phi)*sin(qZ)*cos(psi)-sin(psi)*sin(qZ)*sin(the
+         ta)*cos(phi))*theta'-RZIXY*(sin(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))
+         -cos(qZ)*cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi))))
+         *phi'-RZIXY*(sin(theta)*(sin(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-
+         sin(theta)*cos(phi)*cos(qZ)*cos(theta)*(1-cos(psi)))+cos(theta)*(sin(
+         qZ)*sin(theta)*cos(theta)*(1-cos(psi))-cos(phi)*cos(qZ)*sin(phi)^2*cos
+         (theta)^2*(1-cos(psi))-cos(phi)*cos(qZ)*(cos(psi)+cos(phi)^2*cos(theta)^2
+         *(1-cos(psi)))))*psi')*RZx> + (RZIYZ*qZ'+RZIYZ*(cos(phi)*cos(psi)-sin(
+         phi)*sin(psi)*sin(theta))*theta'+RZIYZ*cos(theta)*(sin(psi)*cos(phi)-
+         sin(phi)*sin(theta)*(1-cos(psi)))*phi'+RZIYY*(sin(phi)*cos(psi)*cos(
+         qZ)+sin(psi)*sin(qZ)*cos(theta)+sin(psi)*sin(theta)*cos(phi)*cos(qZ))*
+         theta'+RZIXY*(cos(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))+sin(qZ)*cos
+         (theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi))))*phi'+RZ
+         IXY*(sin(theta)*(cos(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))+sin(qZ)*
+         sin(theta)*cos(phi)*cos(theta)*(1-cos(psi)))+cos(theta)*(sin(theta)*
+         cos(qZ)*cos(theta)*(1-cos(psi))+sin(qZ)*cos(phi)*sin(phi)^2*cos(theta)^2
+         *(1-cos(psi))+sin(qZ)*cos(phi)*(cos(psi)+cos(phi)^2*cos(theta)^2*(1-
+         cos(psi)))))*psi'-RZIYZ*sin(phi)*cos(theta)*psi'-RZIXY*(sin(psi)*cos(
+         qZ)*cos(theta)-sin(phi)*sin(qZ)*cos(psi)-sin(psi)*sin(qZ)*sin(theta)*
+         cos(phi))*theta'-RZIYY*(sin(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-
+         cos(qZ)*cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi))))
+         *phi'-RZIYY*(sin(theta)*(sin(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-
+         sin(theta)*cos(phi)*cos(qZ)*cos(theta)*(1-cos(psi)))+cos(theta)*(sin(
+         qZ)*sin(theta)*cos(theta)*(1-cos(psi))-cos(phi)*cos(qZ)*sin(phi)^2*cos
+         (theta)^2*(1-cos(psi))-cos(phi)*cos(qZ)*(cos(psi)+cos(phi)^2*cos(theta)^2
+         *(1-cos(psi)))))*psi')*RZy> + (RZIZZ*qZ'+RZIZZ*(cos(phi)*cos(psi)-sin(
+         phi)*sin(psi)*sin(theta))*theta'+RZIZZ*cos(theta)*(sin(psi)*cos(phi)-
+         sin(phi)*sin(theta)*(1-cos(psi)))*phi'+RZIYZ*(sin(phi)*cos(psi)*cos(
+         qZ)+sin(psi)*sin(qZ)*cos(theta)+sin(psi)*sin(theta)*cos(phi)*cos(qZ))*
+         theta'+RZIXZ*(cos(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))+sin(qZ)*cos
+         (theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi))))*phi'+RZ
+         IXZ*(sin(theta)*(cos(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))+sin(qZ)*
+         sin(theta)*cos(phi)*cos(theta)*(1-cos(psi)))+cos(theta)*(sin(theta)*
+         cos(qZ)*cos(theta)*(1-cos(psi))+sin(qZ)*cos(phi)*sin(phi)^2*cos(theta)^2
+         *(1-cos(psi))+sin(qZ)*cos(phi)*(cos(psi)+cos(phi)^2*cos(theta)^2*(1-
+         cos(psi)))))*psi'-RZIZZ*sin(phi)*cos(theta)*psi'-RZIXZ*(sin(psi)*cos(
+         qZ)*cos(theta)-sin(phi)*sin(qZ)*cos(psi)-sin(psi)*sin(qZ)*sin(theta)*
+         cos(phi))*theta'-RZIYZ*(sin(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-
+         cos(qZ)*cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-cos(psi))))
+         *phi'-RZIYZ*(sin(theta)*(sin(qZ)*(cos(psi)+sin(theta)^2*(1-cos(psi)))-
+         sin(theta)*cos(phi)*cos(qZ)*cos(theta)*(1-cos(psi)))+cos(theta)*(sin(
+         qZ)*sin(theta)*cos(theta)*(1-cos(psi))-cos(phi)*cos(qZ)*sin(phi)^2*cos
+         (theta)^2*(1-cos(psi))-cos(phi)*cos(qZ)*(cos(psi)+cos(phi)^2*cos(theta)^2
+         *(1-cos(psi)))))*psi'-mR*(RCMX^2*(sin(phi)*cos(theta)*psi'+sin(psi)*
+         cos(theta)*theta'-sin(theta)*psi'-(cos(psi)+sin(theta)^2*(1-cos(psi)))
+         *phi'-(cos(phi)*cos(psi)-sin(phi)*sin(psi)*sin(theta))*theta'-cos(the
+         ta)*(sin(psi)*cos(phi)-sin(phi)*sin(theta)*(1-cos(psi)))*phi')-RCMY*(
+         RCMX*(cos(phi)*cos(theta)*psi'+(sin(phi)*cos(psi)+sin(psi)*sin(theta)*
+         cos(phi))*theta'+cos(theta)*(sin(phi)*sin(psi)+sin(theta)*cos(phi)*(1-
+         cos(psi)))*phi')-RCMY*(sin(phi)*cos(theta)*psi'-(cos(phi)*cos(psi)-sin
+         (phi)*sin(psi)*sin(theta))*theta'-cos(theta)*(sin(psi)*cos(phi)-sin(
+         phi)*sin(theta)*(1-cos(psi)))*phi'))))*RZz>
+
+   (102) % Forces on system
+   (103) FG_N> = -(mC+3*mR)*g*Ny>
+-> (104) FG_N> = -(mC+3*mR)*g*Ny>
+
+   (105) M_FG_No_N> = Cross(P_No_Scm>, FG_N>)
+-> (106) M_FG_No_N> = g*((mC*CCMX+mR*RCMX+mR*RCMY+mR*RCMZ)*(sin(phi)*cos(psi)+
+         sin(psi)*sin(theta)*cos(phi))-(mC*CCMZ+mR*RCMX+mR*RCMY+mR*RCMZ)*sin(
+         psi)*cos(theta)-(mC*CCMY+mR*RCMY+2*mR*RCMX)*(cos(phi)*cos(psi)-sin(phi)
+         *sin(psi)*sin(theta)))*Nx> + g*((mC*CCMY+mR*RCMY+2*mR*RCMX)*(sin(psi)*
+         cos(phi)+sin(phi)*sin(theta)*cos(psi))-(mC*CCMZ+mR*RCMX+mR*RCMY+mR*RC
+         MZ)*cos(psi)*cos(theta)-(mC*CCMX+mR*RCMX+mR*RCMY+mR*RCMZ)*(sin(phi)*
+         sin(psi)-sin(theta)*cos(phi)*cos(psi)))*Nz>
+
+   (107) % Solve system of equations
+   (108) zero[1] = Dot(DT(H_C_No_N> + H_RX_No_N> + H_RY_No_N> + H_RZ_No_N>, N ) - M_FG_No_N>, Nz>)
+   (109) 

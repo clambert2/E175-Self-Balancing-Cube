@@ -1,30 +1,27 @@
 NewtonianFrame N % Ground frame
 RigidFrame C1, C2 % Define intermediate frame for rotations
 RigidBody C, RX, RY, RZ % Defines all bodies
-Variable theta'', phi'', qX'', qY'', qZ''
+Variable theta'', phi'', psi'', qX'', qY'', qZ''
 Constant g, RCMX, RCMY, RCMZ, CCMX, CCMY, CCMZ
 Point Scm
-
 % Set component mass
 C.SetMass(mC)
 RX.SetMass(mR)
 RY.SetMass(mR)
 RZ.SetMass(mR)
-
 % Define rotations
 C1.RotateZ(N, theta)
-C.RotateX(C1, phi)
+C2.RotateX(C1, phi)
+C.Rotate(C2, Ny>, psi)
 RX.RotateX(C, qX)
 RY.RotateY(C, qY)
 RZ.RotateZ(C, qZ)
-
 % Define distances between points
 P_No_Ccm> = CCMZ*Cx> + CCMX*Cy> - CCMY*Cz>
 P_No_RXcm> = -RCMY*Cz> + RCMX*Cy> + RCMZ*Cx>
 P_No_RYcm> = -RCMX*Cz> + RCMZ*Cy> + RCMY*Cx>
 P_No_RZcm> = -RCMX*Cz> + RCMY*Cy> + RCMX*Cx>
 P_No_Scm> = (1/(mC + 3*mR))*(mR*P_No_RXcm> + mR*P_No_RYcm> + mR*P_No_RZcm> + mC*P_No_Ccm>)
-
 % Find velocities of All CMs
 v_No_N> = 0>
 v_No_C> = 0>
@@ -32,54 +29,23 @@ Ccm.SetVelocity(N, No)
 RXcm.SetVelocity(N, No)
 RYcm.SetVelocity(N, No)
 RZcm.SetVelocity(N, No)
-
 % Set inertia dyadics
 C.SetInertia(No, CIXX, CIYY, CIZZ, CIXY, CIYZ, CIXZ) % Cube frame about No
 RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, RXIXY, RXIYZ, RXIXZ) % X Rotor about RXcm
 RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, RYIXY, RYIYZ, RYIXZ) % Y Rotor about RXcm NEED TO DEFINE THESE IN THE C Frame so there is no rotation matrix needed
 RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, RZIYZ, RZIXZ) % Z Rotor about RXcm
-
 % Calculate translational momentum
 L_C_N> = mC*V_Ccm_N>
 L_RX_N> = mR*V_RXcm_N>
 L_RY_N> = mR*V_RYcm_N>
 L_RZ_N> = mR*V_RZcm_N>
-
 % Calculate the angular momentums
 H_C_No_N> = Dot(I_C_No>>, w_C_N>)
 H_RX_No_N> = Dot(I_RX_RXcm>>, w_RX_N>) + Cross(P_No_RXcm>, L_RX_N>)
 H_RY_No_N> = Dot(I_RY_RYcm>>, w_RY_N>) + Cross(P_No_RYcm>, L_RY_N>)
 H_RZ_No_N> = Dot(I_RZ_RZcm>>, w_RZ_N>) + Cross(P_No_RZcm>, L_RZ_N>)
-
 % Forces on system
 FG_N> = -(mC+3*mR)*g*Ny>
 M_FG_No_N> = Cross(P_No_Scm>, FG_N>)
-
 % Solve system of equations
 zero[1] = Dot(DT(H_C_No_N> + H_RX_No_N> + H_RY_No_N> + H_RZ_No_N>, N ) - M_FG_No_N>, Nz>)
-zero[2] = Dot(DT(H_C_No_N> + H_RX_No_N> + H_RY_No_N> + H_RZ_No_N>, N ) - M_FG_No_N>, Nx>)
-Solve(zero, theta'', phi'')
-
-% CM Positions
-Input RCMX = 0.076 m, RCMY = 0.076 m, RCMZ = 0.007789 m
-Input CCMX = 0.072113 m, CCMY = 0.071399 m, CCMZ = 0.071467 m
-
-% Cube Inertia Dyadic about No
-Input CIXX = 0.011496398 kg*m^2, CIYY = 0.011603443 kg*m^2, CIZZ = 0.011600232 kg*m^2
-Input CIXY = -0.004360713 kg*m^2, CIXZ = 0.004366281 kg*m^2, CIYZ = 0.004314224 kg*m^2
-
-% Z Rotor inertia dyadic about RZcm
-Input RZIXX = 0.000087197 kg*m^2, RZIYY = 0.000086943 kg*m^2, RZIZZ = 0.000173232 kg*m^2
-Input RZIXY = 0.000000127 kg*m^2, RZIXZ = 3.587e-14 kg*m^2, RZIYZ = 8.33e-14 kg*m^2
-
-% X Rotor inertia dyadic about RXcm
-Input RXIXX = 0.000173232 kg*m^2, RXIYY = 0.000086943 kg*m^2, RXIZZ = 0.000087197 kg*m^2
-Input RXIXY = 8.33e-14 kg*m^2, RXIXZ = -3.587e-14 kg*m^2, RXIYZ = -0.000000127 kg*m^2
-
-% Y Rotor inertia dyadic about RYcm
-Input RYIXX = 0.000087197 kg*m^2, RYIYY = 0.000173232 kg*m^2, RYIZZ = 0.000086943 kg*m^2
-Input RYIXY = 3.587e-14 kg*m^2, RYIXZ = -0.000000127 kg*m^2, RYIYZ = -8.33e-14 kg*m^2
-
-Input g = 9.81 m/s^2, mC = 0.84392696 kg, mR = 0.04711499 kg
-
-ODE() cube.m
