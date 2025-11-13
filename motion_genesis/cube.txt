@@ -13,7 +13,7 @@ RZ.SetMass(mR)
 
 % Define rotations
 C1.RotateZ(N, theta)
-C.RotateX(C1, phi)
+C.Rotate(C1, Nx>, phi)
 RX.RotateX(C, qX)
 RY.RotateY(C, qY)
 RZ.RotateZ(C, qZ)
@@ -35,9 +35,9 @@ RZcm.SetVelocity(N, No)
 
 % Set inertia dyadics
 C.SetInertia(No, CIXX, CIYY, CIZZ, CIXY, CIYZ, CIXZ) % Cube frame about No
-RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, RXIXY, RXIYZ, RXIXZ) % X Rotor about RXcm
-RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, RYIXY, RYIYZ, RYIXZ) % Y Rotor about RXcm NEED TO DEFINE THESE IN THE C Frame so there is no rotation matrix needed
-RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, RZIYZ, RZIXZ) % Z Rotor about RXcm
+RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, 0, RXIYZ, 0) % X Rotor about RXcm
+RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, 0, 0, RYIXZ) % Y Rotor about RXcm NEED TO DEFINE THESE IN THE C Frame so there is no rotation matrix needed
+RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, 0, 0) % Z Rotor about RXcm
 
 % Calculate translational momentum
 L_C_N> = mC*V_Ccm_N>
@@ -70,15 +70,15 @@ Input CIXY = -0.004360713 kg*m^2, CIXZ = 0.004366281 kg*m^2, CIYZ = 0.004314224 
 
 % Z Rotor inertia dyadic about RZcm
 Input RZIXX = 0.000087197 kg*m^2, RZIYY = 0.000086943 kg*m^2, RZIZZ = 0.000173232 kg*m^2
-Input RZIXY = 0.000000127 kg*m^2, RZIXZ = 3.587e-14 kg*m^2, RZIYZ = 8.33e-14 kg*m^2
+Input RZIXY = 0.000000127 kg*m^2
 
 % X Rotor inertia dyadic about RXcm
 Input RXIXX = 0.000173232 kg*m^2, RXIYY = 0.000086943 kg*m^2, RXIZZ = 0.000087197 kg*m^2
-Input RXIXY = 8.33e-14 kg*m^2, RXIXZ = -3.587e-14 kg*m^2, RXIYZ = -0.000000127 kg*m^2
+Input RXIYZ = -0.000000127 kg*m^2
 
 % Y Rotor inertia dyadic about RYcm
 Input RYIXX = 0.000087197 kg*m^2, RYIYY = 0.000173232 kg*m^2, RYIZZ = 0.000086943 kg*m^2
-Input RYIXY = 3.587e-14 kg*m^2, RYIXZ = -0.000000127 kg*m^2, RYIYZ = -8.33e-14 kg*m^2
+Input RYIXZ = -0.000000127 kg*m^2
 
 Input g = 9.81 m/s^2, mC = 0.84392696 kg, mR = 0.04711499 kg
 

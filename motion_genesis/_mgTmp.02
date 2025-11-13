@@ -1,7 +1,7 @@
 NewtonianFrame N % Ground frame
 RigidFrame C1, C2 % Define intermediate frame for rotations
 RigidBody C, RX, RY, RZ % Defines all bodies
-Variable theta'', phi'', psi'', qX'', qY'', qZ''
+Variable theta'', phi'', qX'', qY'', qZ''
 Constant g, RCMX, RCMY, RCMZ, CCMX, CCMY, CCMZ
 Point Scm
 % Set component mass
@@ -10,9 +10,8 @@ RX.SetMass(mR)
 RY.SetMass(mR)
 RZ.SetMass(mR)
 % Define rotations
-C1.Rotate(N, Nz>, theta)
-C2.Rotate(C1, Nx>, phi)
-C.Rotate(C2, Ny>, psi)
+C1.RotateZ(N, theta)
+C.Rotate(C1, Nx>, phi)
 RX.RotateX(C, qX)
 RY.RotateY(C, qY)
 RZ.RotateZ(C, qZ)
@@ -31,9 +30,9 @@ RYcm.SetVelocity(N, No)
 RZcm.SetVelocity(N, No)
 % Set inertia dyadics
 C.SetInertia(No, CIXX, CIYY, CIZZ, CIXY, CIYZ, CIXZ) % Cube frame about No
-RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, RXIXY, RXIYZ, RXIXZ) % X Rotor about RXcm
-RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, RYIXY, RYIYZ, RYIXZ) % Y Rotor about RXcm NEED TO DEFINE THESE IN THE C Frame so there is no rotation matrix needed
-RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, RZIYZ, RZIXZ) % Z Rotor about RXcm
+RX.SetInertia(RXcm, RXIXX, RXIYY, RXIZZ, 0, RXIYZ, 0) % X Rotor about RXcm
+RY.SetInertia(RYcm, RYIXX, RYIYY, RYIZZ, 0, 0, RYIXZ) % Y Rotor about RXcm NEED TO DEFINE THESE IN THE C Frame so there is no rotation matrix needed
+RZ.SetInertia(RZcm, RZIXX, RZIYY, RZIZZ, RZIXY, 0, 0) % Z Rotor about RXcm
 % Calculate translational momentum
 L_C_N> = mC*V_Ccm_N>
 L_RX_N> = mR*V_RXcm_N>
@@ -43,9 +42,11 @@ L_RZ_N> = mR*V_RZcm_N>
 H_C_No_N> = Dot(I_C_No>>, w_C_N>)
 H_RX_No_N> = Dot(I_RX_RXcm>>, w_RX_N>) + Cross(P_No_RXcm>, L_RX_N>)
 H_RY_No_N> = Dot(I_RY_RYcm>>, w_RY_N>) + Cross(P_No_RYcm>, L_RY_N>)
-H_RZ_No_N> = Dot(I_RZ_RXcm>>, w_RZ_N>) + Cross(P_No_RZcm>, L_RZ_N>)
+H_RZ_No_N> = Dot(I_RZ_RZcm>>, w_RZ_N>) + Cross(P_No_RZcm>, L_RZ_N>)
 % Forces on system
 FG_N> = -(mC+3*mR)*g*Ny>
 M_FG_No_N> = Cross(P_No_Scm>, FG_N>)
 % Solve system of equations
 zero[1] = Dot(DT(H_C_No_N> + H_RX_No_N> + H_RY_No_N> + H_RZ_No_N>, N ) - M_FG_No_N>, Nz>)
+zero[2] = Dot(DT(H_C_No_N> + H_RX_No_N> + H_RY_No_N> + H_RZ_No_N>, N ) - M_FG_No_N>, C1x>)
+Solve(zero, theta'', phi'')
