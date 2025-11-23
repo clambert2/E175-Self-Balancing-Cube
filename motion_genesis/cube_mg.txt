@@ -5,11 +5,13 @@ System CUBE( C, X, Y, Z) % Defines all bodies
 Variable H'', P'', S'', qX'', qY'', qZ''
 Constant g, RX, RY, RZ, CX, CY, CZ
 Point Scm
+
 % Set component mass
 C.SetMass(mC)
 X.SetMass(mR)
 Y.SetMass(mR)
 Z.SetMass(mR)
+
 % Define rotations
 C1.RotateZ(N, H)
 C2.Rotate(C1, Nx>, P)
@@ -17,12 +19,16 @@ C.Rotate(C2, Ny>, S)
 X.RotateX(C, qX)
 Y.RotateY(C, qY)
 Z.RotateZ(C, qZ)
+
 % Define distances between points
 P_No_Ccm> = CZ*Cx> + CX*Cy> - CY*Cz>
 P_No_Xcm> = -RY*Cz> + RX*Cy> + RZ*Cx>
 P_No_Ycm> = -RX*Cz> + RZ*Cy> + RY*Cx>
 P_No_Zcm> = -RX*Cz> + RY*Cy> + RX*Cx>
 P_No_Scm> = (1/(mC + 3*mR))*(mR*P_No_Xcm> + mR*P_No_Ycm> + mR*P_No_Zcm> + mC*P_No_Ccm>)
+
+
+
 % Find velocities of All CMs
 v_No_N> = 0>
 v_No_C> = 0>
@@ -30,17 +36,41 @@ Ccm.SetVelocity(N, No)
 Xcm.SetVelocity(N, No)
 Ycm.SetVelocity(N, No)
 Zcm.SetVelocity(N, No)
+
 % Set inertia dyadics
 C.SetInertia(No, CIX, CIY, CIZ)% CIXY, CIYZ, CIXZ) % Cube frame about No
 X.SetInertia(Xcm, RI, 0, 0) % X Rotor about Xcm
 Y.SetInertia(Ycm, 0, RI, 0) % Y Rotor about Xcm NEED TO DEFINE THESE IN THE C Frame so there is no rotation matrix needed
 Z.SetInertia(Zcm, 0, 0, RI) % Z Rotor about Xcm
+
 % C.GetAngularMomentum(No)
 % X.GetAngularMomentum(No)
 % Y.GetAngularMomentum(No)
 % Z.GetAngularMomentum(No)
 H_S_No_N> = CUBE.GetAngularMomentum(No)
+
 % Forces on system
 FG_N> = -(mC+3*mR)*g*Ny>
 M_FG_No_N> = Cross(P_No_Scm>, FG_N>)
 
+% Solve system of equations
+zero[1] = Dot(DT(H_S_No_N>, N ) - M_FG_No_N>, Nz>)
+zero[2] = Dot(DT(H_S_No_N>, N ) - M_FG_No_N>, Nx>)
+zero[3] = Dot(DT(H_S_No_N>, N ) - M_FG_No_N>, Ny>)
+Solve(zero, H'', S'', P'')
+
+% CM Positions
+Input RX = 0.076 m, RY = 0.076 m, RZ = 0.007789 m
+Input CX = 0.072113 m, CY = 0.071399 m, CZ = 0.071467 m
+
+% Cube Inertia Dyadic about No
+Input CIX = 0.011496398 kg*m^2, CIY = 0.011603443 kg*m^2, CIZ = 0.011600232 kg*m^2
+%Input CIXY = -0.004360713 kg*m^2, CIXZ = 0.004366281 kg*m^2, CIYZ = 0.004314224 kg*m^2
+
+% X Rotor inertia dyadic about Xcm
+Input RI = 0.000173232 kg*m^2%, RIYY = 0.000086943 kg*m^2, RIZZ = 0.000087197 kg*m^2
+%Input RIYZ = -0.000000127 kg*m^2
+
+Input g = 9.81 m/s^2, mC = 0.84392696 kg, mR = 0.04711499 kg
+
+ODE() cube_mg_H.m

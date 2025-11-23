@@ -1,7 +1,3 @@
-close all;
-clc
-clear
-
 % Constants from MG
 % %-------------------------------+--------------------------+-------------------+-----------------
 % % Quantity                      | Value                    | Units             | Description
@@ -574,10 +570,10 @@ A_lin = subs(A, {theta, phi ...
                  qX, qY, qZ, ...
                  qXDt, qYDt, qZDt, ...
                  qXDDt, qYDDt, qZDDt}, ...
-                {pi/4, pi/4, ... 
+                {pi/2, pi/2, ... 
                  0, 0, ... 
                  0, 0, 0, ...       
-                 0, 0, 0, ... 
+                 2*pi, 2*pi, 2*pi, ... 
                  0, 0, 0});
 
 B_lin = subs(B, {theta, phi ...
@@ -585,10 +581,10 @@ B_lin = subs(B, {theta, phi ...
                  qX, qY, qZ, ...
                  qXDt, qYDt, qZDt, ...
                  qXDDt, qYDDt, qZDDt}, ...
-                {pi/4, pi/4, ...
+                {pi/2, pi/2, ...
                  0, 0, ...
                  0, 0, 0, ...
-                 0, 0, 0, ...
+                 2*pi, 2*pi, 2*pi, ...
                  0, 0, 0});
 A_num = double(A_lin);
 B_num = double(B_lin);
@@ -608,78 +604,12 @@ disp(D)
 % Create state space system
 sys = ss(A_num,B_num,C,D);
 
-Q = eye(10,10)*0.00001
-Q(1,1) = 10000
-Q(2,2) = 10000000
-
-R = eye(3,3)*0.5
-
-[K,S,P] = lqr(sys, Q, R)
-
-ctrl_sys = ss((A_num - B_num*K), B_num, C, D);
-
-t = 0:0.1:5;
-x0 = [pi/4-0.1, pi/4-0.1, 0, 0, 0, 0, 0, 0, 0, 0]
-[y, t, x] = initial(ctrl_sys, x0, t)
-
-% figure;
-% plot(x(:,1),x(:,2))
-% 
-% figure;
-
-% Sizes
-n = size(A_num,1);
-p = size(C,1);
-
-% Build the block system:
-% [A B; C D] * [Nx; Nu] = [0; I]
-M  = [A_num, B_num; C, D];
-RHS = [zeros(n,p); eye(p)];
-
-% Solve for the stacked [Nx; Nu]
-X = M \ RHS;    % size (n+ p) x p
-
-Nx = X(1:n, :);   % n x p
-Nu = X(n+1:end, :); % p x p
-
-% compute Kr
-Kr = Nu + K * Nx;  % p x p  (so Kr*r gives p×1 input)
-
-
 % Check for controllability
 Co =ctrb(A_num, B_num);
 rank(Co) % Rank should equal 10
 
 % Plot the poles and zeros of the system
 pzplot(sys)
-
-
-% desired reference (non-zero) - dimension must match p = size(C,1)
-r = [pi/4; pi/4];  % for example
-
-% closed-loop controller: u = -K*x + Kr*r
-
-% Simulate with ode45 (nonlinear in general because controller uses x):
-closed_loop = @(t,x) (A_num - B_num*K)*x + B_num*(Kr*r);
-
-
-[t,x] = ode45(closed_loop, [0, 100], x0);
-
-figure;
-hold on
-plot(x(:,1), x(:,2))
-plot(x(1,1), x(1,2), 'ro')
-plot(x(end,1), x(end,2), 'bo')
-plot(r(1), r(2), 'gx')
-
-figure;
-plot(t,x(:,1))
-hold on
-plot(t,x(:,2))
-% Plot vertical lines
-yline(0, '--r', 'LineWidth', 1);           % x = 0
-yline(pi/4, '--r', 'LineWidth', 1);        % x = pi/4
-yline(pi/2, '--r', 'LineWidth', 1);        % x = pi/2
 
 % --- Gains ---
 K1 = 180;
