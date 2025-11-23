@@ -609,18 +609,19 @@ disp(D)
 sys = ss(A_num,B_num,C,D);
 
 Q = eye(10,10)*0.00001
-Q(1,1) = 10000
-Q(2,2) = 10000000
+Q(1,1) = 100000000000
+Q(2,2) = 100000000000
 
-R = eye(3,3)*0.5
+R = eye(3,3)*0.5;
 
-[K,S,P] = lqr(sys, Q, R)
+[K,S,P] = lqr(sys, Q, R);
+disp(P)
 
 ctrl_sys = ss((A_num - B_num*K), B_num, C, D);
 
 t = 0:0.1:5;
-x0 = [pi/4-0.1, pi/4-0.1, 0, 0, 0, 0, 0, 0, 0, 0]
-[y, t, x] = initial(ctrl_sys, x0, t)
+x0 = [pi/4 + 0.01, pi/4 + 0.01, 0, 0, 0, 0, 0, 0, 0, 0];
+[y, t, x] = initial(ctrl_sys, x0, t);
 
 % figure;
 % plot(x(:,1),x(:,2))
@@ -651,7 +652,7 @@ Co =ctrb(A_num, B_num);
 rank(Co) % Rank should equal 10
 
 % Plot the poles and zeros of the system
-pzplot(sys)
+pzplot(sys);
 
 
 % desired reference (non-zero) - dimension must match p = size(C,1)
@@ -663,16 +664,20 @@ r = [pi/4; pi/4];  % for example
 closed_loop = @(t,x) (A_num - B_num*K)*x + B_num*(Kr*r);
 
 
-[t,x] = ode45(closed_loop, [0, 100], x0);
+[t,x] = ode45(closed_loop, [0, 1], x0);
 
 figure;
+subplot(1,2,1)
+
+
 hold on
 plot(x(:,1), x(:,2))
-plot(x(1,1), x(1,2), 'ro')
-plot(x(end,1), x(end,2), 'bo')
 plot(r(1), r(2), 'gx')
+plot(x(1,1), x(2,1), 'bo')
+plot(x(end,1), x(end,2), 'ro')
 
-figure;
+
+subplot(1,2,2)
 plot(t,x(:,1))
 hold on
 plot(t,x(:,2))
