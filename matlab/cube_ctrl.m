@@ -1,3 +1,10 @@
+% cube_ctrl.m
+%
+% Charlie Lambert and Ian Smith
+% E175 Fall 2025 Prof. Bassman
+%
+% Final Project
+
 close all;
 clc
 clear
@@ -561,14 +568,16 @@ cos(qZ)*(cos(phi)+sin(theta)^2*(1-cos(phi))))+cos(theta)*(sin(theta)*cos(qZ)*cos
 1-cos(phi)))))-RZIXY*(sin(theta)*(sin(theta)*cos(qZ)*cos(theta)*(1-cos(phi))-sin(qZ)*(cos(phi)+sin(theta)^2*(1-cos(phi))))-cos(  ...
 theta)*(sin(qZ)*sin(theta)*cos(theta)*(1-cos(phi))-cos(qZ)*(cos(phi)+cos(theta)^2*(1-cos(phi))))))));
 
-% Given State and Control vectors create a linearized state matrix
+% Create state vector and control vector
 x  = [theta; phi; qX; qY; qX; thetaDt; phiDt; qXDt; qYDt; qZDt];
 u  = [qXDDt; qYDDt; qZDDt];
 x_dot  = [thetaDt; phiDt; qXDt; qYDt; qZDt; thetaDDt; phiDDt; qXDDt; qYDDt; qZDDt];
+
+% Form jacobian state and control matrix
 A = jacobian(x_dot, x);
 B = jacobian(x_dot, u);
 
-% Substitute valves for the points that the system is linearized about
+% Substitute vales for where the linearization equlibrium point is
 A_lin = subs(A, {theta, phi ...
                  thetaDt, phiDt ...
                  qX, qY, qZ, ...
@@ -579,7 +588,6 @@ A_lin = subs(A, {theta, phi ...
                  0, 0, 0, ...       
                  0, 0, 0, ... 
                  0, 0, 0});
-
 B_lin = subs(B, {theta, phi ...
                  thetaDt, phiDt ...
                  qX, qY, qZ, ...
@@ -599,164 +607,64 @@ C(1,1) = 1;
 C(2,2) = 1;
 D = zeros(2,3);
 
-% Display all matrixes
-disp(A_num)
-disp(B_num)
-disp(C)
-disp(D)
-
 % Create state space system
 sys = ss(A_num,B_num,C,D);
 
-Q = eye(10,10)*0.00001
-Q(1,1) = 100000000000
-Q(2,2) = 100000000000
-
-R = eye(3,3)*0.5;
-
-[K,S,P] = lqr(sys, Q, R);
-disp(P)
-
-ctrl_sys = ss((A_num - B_num*K), B_num, C, D);
-
-t = 0:0.1:5;
-x0 = [pi/4 + 0.01, pi/4 + 0.01, 0, 0, 0, 0, 0, 0, 0, 0];
-[y, t, x] = initial(ctrl_sys, x0, t);
-
-% figure;
-% plot(x(:,1),x(:,2))
-% 
-% figure;
-
-% Sizes
-n = size(A_num,1);
-p = size(C,1);
-
-% Build the block system:
-% [A B; C D] * [Nx; Nu] = [0; I]
-M  = [A_num, B_num; C, D];
-RHS = [zeros(n,p); eye(p)];
-
-% Solve for the stacked [Nx; Nu]
-X = M \ RHS;    % size (n+ p) x p
-
-Nx = X(1:n, :);   % n x p
-Nu = X(n+1:end, :); % p x p
-
-% compute Kr
-Kr = Nu + K * Nx;  % p x p  (so Kr*r gives p×1 input)
-
-
 % Check for controllability
-Co =ctrb(A_num, B_num);
+Co = ctrb(A_num, B_num);
 rank(Co) % Rank should equal 10
 
-% Plot the poles and zeros of the system
-pzplot(sys);
+% Plot all of the poles and zeros for the uncontrolled system
+pzplot(sys)
 
+% Choose values for Q and R matrixes
+Q = eye(10,10)*0.0005;
+Q(1,1) = 10000000000;
+Q(2,2) = 10000000000;
+R = eye(3,3)*0.1;
 
-% desired reference (non-zero) - dimension must match p = size(C,1)
-r = [pi/4; pi/4];  % for example
+% Solve for gain matrix using lqr control
+[K,S,P] = lqr(sys, Q, R);
 
-% closed-loop controller: u = -K*x + Kr*r
+% Compute Kr
+n = size(A_num,1);
+p = size(C,1);
+M  = [A_num, B_num; C, D];
+RHS = [zeros(n,p); eye(p)];
+X = M \ RHS;
+Nx = X(1:n, :);
+Nu = X(n+1:end, :);
+Kr = Nu + K * Nx;
 
-% Simulate with ode45 (nonlinear in general because controller uses x):
+% Desired balance point
+r = [pi/4; pi/4];
+
+% closed loop optimal control
 closed_loop = @(t,x) (A_num - B_num*K)*x + B_num*(Kr*r);
 
+% solve closed loop system
+x0 = [pi/4, pi/4, 0, 0, 0, 0, 0, 0, 0, 0];
+[t,x] = ode45(closed_loop, [0, 2], x0);
 
-[t,x] = ode45(closed_loop, [0, 1], x0);
-
+% Plot angular outputs over time
 figure;
-subplot(1,2,1)
-
-
-hold on
-plot(x(:,1), x(:,2))
-plot(r(1), r(2), 'gx')
-plot(x(1,1), x(2,1), 'bo')
-plot(x(end,1), x(end,2), 'ro')
-
-
-subplot(1,2,2)
 plot(t,x(:,1))
 hold on
 plot(t,x(:,2))
-% Plot vertical lines
-yline(0, '--r', 'LineWidth', 1);           % x = 0
-yline(pi/4, '--r', 'LineWidth', 1);        % x = pi/4
-yline(pi/2, '--r', 'LineWidth', 1);        % x = pi/2
+xlabel('Time [s]')
+ylabel('Angle [Rad]')
+yline(pi/4 - deg2rad(5), '--r', 'LineWidth', 1);
+yline(pi/4 + deg2rad(5), '--r', 'LineWidth', 1);
+title('Closed Loop Control of \theta and \phi')
+legend('\theta', '\phi')
 
-% --- Gains ---
-K1 = 180;
-K2 = 30.00; 
-K3 = 1.6;
-K4 = 0.008;
-zK2 = 8.00;
-zK3 = 0.30;
-
-% --- geometry (120-degree triad) ---
-T = [ 1,   -0.5,       -0.5;
-      0,  sqrt(3)/2, -sqrt(3)/2;
-      1,    1,          1    ];
-Tinv = inv(T);
-
-% --- Build K_tau : maps x -> [tau_X; tau_Y; tau_Z]  (3 x 10) ---
-Ktau = zeros(3,10);
-
-% tau_X (body X torque) comes from phi (x2), phiDt (x7), speed_X (combination of q dot)
-% speed_X = T(1,:) * [qXDot; qYDot; qZDot] -> columns 8,9,10 correspond to qXDt,qYDt,qZDt
-Ktau(1,2)  = K1;               % phi
-Ktau(1,7)  = K2;               % phiDt
-Ktau(1,8:10) = K3 * T(1,:);    % contribution from wheel speeds to speed_X
-
-% tau_Y
-Ktau(2,1)  = K1;               % theta
-Ktau(2,6)  = K2;               % thetaDt
-Ktau(2,8:10) = K3 * T(2,:);    % speed_Y
-
-% tau_Z (yaw)
-% include gyro (if you have gyro_z as a state) and wheel-speed yaw term:
-Ktau(3,10) = zK2;              % if gyro Z is x(10) (otherwise adjust)
-Ktau(3,8:10) = Ktau(3,8:10) + zK3 * T(3,:);
-
-% --- Map body-torque gains to wheel gains: K_wheels = Tinv * Ktau ---
-K_fw = Tinv * Ktau;   % 3 x 10
-
-% Solve for estimate motor conversions
-Vbatt      = 12.0;     % Battery voltage (V)
-PWM_max    = 255;      % 8-bit PWM
-Kt         = 0.018;    % Torque constant (Nm/A) (estimate)
-R_winding  = 1.2;      % Winding resistance (Ohm) (estimate)
-I_rotor    = 0.000173232;   % Rotor inertia (kg*m^2) (estimate)
-gear_ratio = 1;        % Use 1 if no gearbox. If gearbox present, set, e.g., 30.
-
-tau_perPWM = (Kt * Vbatt) / (R_winding * PWM_max);
-G = (tau_perPWM * gear_ratio) / I_rotor;   % rad/s^2 per 1 PWM unit
-
-fprintf('Acceleration per PWM unit: %.6f rad/s^2 per PWM\n', G);
-
-% ----------------------------------------------
-% 5. Convert firmware gain matrix to model K
-% ----------------------------------------------
-K_model = G * K_fw;
-
-% Controller: u = -K_wheels * x
-Acl = A_num - B_num * K_model
-
-pcl = eig(Acl);
-disp('Closed-loop poles (with geometry):'); disp(pcl);
-
-% n = size(Acl,1);
-% sys_cl = ss(Acl, zeros(n,0), eye(n), 0);
-% figure; pzmap(sys_cl); title('Closed-loop poles/zeros (with geometry)');
-% 
-% % 0) quick display
-% eigA = eig(A_num);
-% disp('Open-loop poles (A):'); disp(eigA);
-% 
-% % 1) check closed-loop construction
-% Acl = A_num - B_num * K_wheels;   % ensure you used minus
-% pcl = eig(Acl);
-% disp('Closed-loop poles (A - B*K):'); disp(pcl);
-
-
+% Plot poles before and after closed loop control
+figure;
+hold on
+grid on
+plot(real(pole(sys)), imag(pole(sys)), 'rx', 'MarkerSize', 8, 'LineWidth', 1);
+plot(real(P), imag(P), 'bx', 'MarkerSize', 8, 'LineWidth', 1);
+xlabel('Real Axis');
+ylabel('Imaginary Axis');
+title('Open-loop vs Closed-loop Poles');
+legend('Open-loop poles', 'Closed-loop poles','Location', 'southeast');

@@ -64,9 +64,9 @@ float alpha = 0.74;
 
 int16_t  AcX, AcY, AcZ, GyX, GyY, GyZ, gyroX, gyroY, gyroZ, gyroYfilt, gyroZfilt;
 
-int16_t  GyZ_offset = 0;
-int16_t  GyY_offset = 0;
-int16_t  GyX_offset = 0;
+int16_t  GyZ_offset = -31;
+int16_t  GyY_offset = 29;
+int16_t  GyX_offset = -1;
 int32_t  GyZ_offset_sum = 0;
 int32_t  GyY_offset_sum = 0;
 int32_t  GyX_offset_sum = 0;

@@ -611,13 +611,73 @@ rank(Co) % Rank should equal 10
 % Plot the poles and zeros of the system
 pzplot(sys)
 
+function motors = cube_controller(x, params)
+% x = state vector:
+%   x = [theta; phi; qX; qY; qZ; thetaDt; phiDt; qXDt; qYDt; qZDt]
+%
+% params contains:
+%   K1,K2,K3,K4,zK2,zK3          (gains)
+%   alpha                        (gyro filter constant)
+%   motors_speed_X, motors_speed_Y, motors_speed_Z   (integrators)
+%   speed_X, speed_Y             (velocity terms)
+%   gyro_raw = [GyX, GyY, GyZ]   (raw IMU values)
+%
+% returns motors = [m1; m2; m3]  PWM values for motors
+    K1 = 180;
+    K2 = 30.00; 
+    K3 = 1.6;
+    K4 = 0.008;
+    zK2 = 8.00;
+    zK3 = 0.30;
+    % Unpack states
+    theta   = x(1);
+    phi     = x(2);
+    qXDt    = x(8);
+    qYDt    = x(9);
+    qZDt    = x(10);
+
+    % --- Filter Gyro ------------------------------------------------------
+    gyro = params.gyro_raw / 131.0;
+
+    persistent gyroXf gyroYf
+    if isempty(gyroXf); gyroXf = 0; gyroYf = 0; end
+
+    gyroXf = params.alpha*gyro(1) + (1-params.alpha)*gyroXf;
+    gyroYf = params.alpha*gyro(2) + (1-params.alpha)*gyroYf;
+
+    % --- PID-like control law ---------------------------------------------
+    pwm_X = params.K1*theta + params.K2*gyroXf + ...
+            params.K3*params.speed_X + params.K4*params.motors_speed_X;
+
+    pwm_Y = params.K1*phi   + params.K2*gyroYf + ...
+            params.K3*params.speed_Y + params.K4*params.motors_speed_Y;
+
+    pwm_Z = params.zK2*gyro(3) + params.zK3*params.motors_speed_Z;
+
+    % Saturate
+    pwm_X = max(min(pwm_X,255),-255);
+    pwm_Y = max(min(pwm_Y,255),-255);
+    pwm_Z = max(min(pwm_Z,255),-255);
+
+    % --- Motor integrators (like I-terms) ---------------------------------
+    params.motors_speed_X = params.motors_speed_X + params.speed_X/5;
+    params.motors_speed_Y = params.motors_speed_Y + params.speed_Y/5;
+
+    % --- Transform XYZ torques → three motor torques ----------------------
+    motors = XYZ_to_threeWay(-pwm_X, pwm_Y, -pwm_Z);
+
+end
+
+function motors = XYZ_to_threeWay(pwm_X,pwm_Y,pwm_Z)
+    m1 = round((0.5*pwm_X - 0.866*pwm_Y)/1.37 + pwm_Z);
+    m2 = round((0.5*pwm_X + 0.866*pwm_Y)/1.37 + pwm_Z);
+    m3 = round(-pwm_X/1.37 + pwm_Z);
+    motors = [m1; m2; m3];
+end
+
+
 % --- Gains ---
-K1 = 180;
-K2 = 30.00; 
-K3 = 1.6;
-K4 = 0.008;
-zK2 = 8.00;
-zK3 = 0.30;
+
 
 % --- geometry (120-degree triad) ---
 T = [ 1,   -0.5,       -0.5;
@@ -670,18 +730,3 @@ Acl = A_num - B_num * K_model
 
 pcl = eig(Acl);
 disp('Closed-loop poles (with geometry):'); disp(pcl);
-
-% n = size(Acl,1);
-% sys_cl = ss(Acl, zeros(n,0), eye(n), 0);
-% figure; pzmap(sys_cl); title('Closed-loop poles/zeros (with geometry)');
-% 
-% % 0) quick display
-% eigA = eig(A_num);
-% disp('Open-loop poles (A):'); disp(eigA);
-% 
-% % 1) check closed-loop construction
-% Acl = A_num - B_num * K_wheels;   % ensure you used minus
-% pcl = eig(Acl);
-% disp('Closed-loop poles (A - B*K):'); disp(pcl);
-
-
